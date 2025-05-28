@@ -1,7 +1,7 @@
 // API integration utilities
 // This file prepares the project for future API integration
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T> { // what types we want 
   data: T | null;
   error: string | null;
   loading: boolean;
