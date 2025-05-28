@@ -668,3 +668,11 @@ footer p {
     font-size: 0.9rem;
   }
 }
+
+.back-button {
+  margin-top: 2rem;
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}

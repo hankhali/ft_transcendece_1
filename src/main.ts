@@ -473,21 +473,25 @@ function renderTournamentList(container: HTMLElement, tournaments: Tournament[])
     const header = document.createElement('div');
     header.className = 'tournament-header';
     
-    const name = document.createElement('h3');
-    name.textContent = t.name;
+    const title = document.createElement('h3');
+    title.textContent = t.name;
     
-    const statusIndicator = document.createElement('div');
-    statusIndicator.className = `status-indicator status-${t.status.toLowerCase().replace(' ', '-')}`;
+    const status = document.createElement('div');
+    status.className = `status-indicator status-${t.status.toLowerCase()}`;
     
-    header.appendChild(name);
-    header.appendChild(statusIndicator);
+    header.appendChild(title);
+    header.appendChild(status);
     
-    const details = document.createElement('p');
-    details.textContent = `Players: ${t.players} | Status: ${t.status}`;
+    const details = document.createElement('div');
+    details.className = 'tournament-details';
+    details.innerHTML = `
+      <p>Players: ${t.players.length}/${t.maxPlayers}</p>
+      <p>Status: ${t.status}</p>
+    `;
     
     const joinBtn = document.createElement('button');
-    joinBtn.className = t.status === 'Open' ? 'primary-button join-button' : 'secondary-button join-button';
-    joinBtn.textContent = 'Join Tournament';
+    joinBtn.className = 'primary-button join-button';
+    joinBtn.textContent = t.status === 'Open' ? 'Join Tournament' : 'Tournament Full';
     joinBtn.disabled = t.status !== 'Open';
     
     if (t.status === 'Open') {
@@ -531,13 +535,12 @@ function renderTournamentList(container: HTMLElement, tournaments: Tournament[])
   const existingBackBtn = container.querySelector('.back-button');
   if (!existingBackBtn) {
     const backBtn = document.createElement('button');
-    backBtn.className = 'secondary-button';
+    backBtn.className = 'secondary-button back-button';
     backBtn.textContent = 'Back to Home';
     backBtn.addEventListener('click', () => navigateTo('home'));
     container.appendChild(backBtn);
   }
 }
-
 // Helper functions
 function showError(message: string): void {
   state.error = message;
