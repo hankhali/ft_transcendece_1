@@ -1,638 +1,611 @@
-import './style.css';
-import { apiService, type Tournament, type User } from './api';
+import './style.css'; // Ensure your CSS is imported
+import { setupRoutes } from './router';
 
-// DOM Elements
-const appElement = document.querySelector<HTMLDivElement>('#app')!;
+// Global variables for message display
+let messageTimeout: number | null = null;
 
-// Create navigation bar
+// Utility function to navigate between pages
+function navigateTo(path: string) {
+  history.pushState(null, '', path);
+  const app = document.getElementById('app');
+  if (app) {
+    app.innerHTML = ''; // Clear current page
+    setupRoutes(app); // Render new page based on route
+  }
+}
+
+// Function to create a generic loading overlay
+function createLoadingOverlay(): HTMLElement {
+  const overlay = document.createElement('div');
+  overlay.className = 'loading-overlay';
+  overlay.id = 'loading-overlay'; // Add ID for easy access
+
+  const spinner = document.createElement('div');
+  spinner.className = 'spinner';
+  overlay.appendChild(spinner);
+
+  const loadingText = document.createElement('p');
+  loadingText.className = 'loading-text';
+  loadingText.textContent = 'Loading...';
+  overlay.appendChild(loadingText);
+
+  return overlay;
+}
+
+// Function to show the loading overlay
+function showLoading() {
+  const app = document.getElementById('app');
+  if (app) {
+    let overlay = document.getElementById('loading-overlay');
+    if (!overlay) {
+      overlay = createLoadingOverlay();
+      app.appendChild(overlay);
+    }
+    overlay.classList.remove('hidden');
+  }
+}
+
+// Function to hide the loading overlay
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
+}
+
+// Function to display messages (error/success)
+function showMessage(text: string, type: 'success' | 'error') {
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  // Clear existing messages and timeouts
+  const existingMessage = document.querySelector('.message');
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+  if (messageTimeout) {
+    clearTimeout(messageTimeout);
+    messageTimeout = null;
+  }
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${type}-message`;
+  messageDiv.textContent = text;
+  app.prepend(messageDiv); // Add to the top of the app
+
+  messageTimeout = setTimeout(() => {
+    messageDiv.classList.add('hidden'); // Fade out or slide up
+    messageDiv.remove(); // Remove from DOM after transition
+  }, 5000); // Message disappears after 5 seconds
+}
+
+// --- Component Functions (for different pages/sections) ---
+
+// Navbar Component
 function createNavbar(): HTMLElement {
   const navbar = document.createElement('nav');
   navbar.className = 'navbar';
-  
-  // Logo
+
   const logo = document.createElement('a');
-  logo.href = '#';
   logo.className = 'navbar-logo';
-  logo.innerHTML = '<span>ft_transcendence</span>';
+  logo.textContent = 'Neon Pong';
+  logo.href = '/'; // Link to home
   logo.addEventListener('click', (e) => {
     e.preventDefault();
-    navigateTo('home');
+    navigateTo('/');
   });
-  
-  // Navigation links
+
   const navLinks = document.createElement('div');
   navLinks.className = 'navbar-links';
-  
+
   const homeLink = document.createElement('a');
-  homeLink.href = '#home';
   homeLink.className = 'navbar-link';
   homeLink.textContent = 'Home';
+  homeLink.href = '/';
   homeLink.addEventListener('click', (e) => {
     e.preventDefault();
-    navigateTo('home');
+    navigateTo('/');
   });
-  
-  const registerLink = document.createElement('a');
-  registerLink.href = '#register';
-  registerLink.className = 'navbar-link';
-  registerLink.textContent = 'Register';
-  registerLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    navigateTo('register');
-  });
-  
+
   const tournamentLink = document.createElement('a');
-  tournamentLink.href = '#tournament';
   tournamentLink.className = 'navbar-link';
-  tournamentLink.textContent = 'Tournament';
+  tournamentLink.textContent = 'Tournaments';
+  tournamentLink.href = '/tournament';
   tournamentLink.addEventListener('click', (e) => {
     e.preventDefault();
-    navigateTo('tournament');
+    navigateTo('/tournament');
   });
-  
+
+  const registerLink = document.createElement('a');
+  registerLink.className = 'navbar-link';
+  registerLink.textContent = 'Register';
+  registerLink.href = '/register';
+  registerLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo('/register');
+  });
+
   navLinks.appendChild(homeLink);
-  navLinks.appendChild(registerLink);
   navLinks.appendChild(tournamentLink);
-  
-  navbar.appendChild(logo);
+  navLinks.appendChild(registerLink);
+  // Add other links here (e.g., login, profile)
+
+  navbar.appendChild(logo); // Logo is hidden by CSS but kept for structure
   navbar.appendChild(navLinks);
-  
+
+  // Set active link based on current path
+  const currentPath = window.location.pathname;
+  if (currentPath === '/') homeLink.classList.add('active');
+  else if (currentPath.startsWith('/tournament')) tournamentLink.classList.add('active');
+  else if (currentPath.startsWith('/register')) registerLink.classList.add('active');
+
   return navbar;
 }
 
-// Create footer
+// Footer Component
 function createFooter(): HTMLElement {
   const footer = document.createElement('footer');
   const footerText = document.createElement('p');
-  footerText.innerHTML = 'Team ft_transcendence';
+  footerText.textContent = `© ${new Date().getFullYear()} Neon Pong. All rights reserved.`;
   footer.appendChild(footerText);
   return footer;
 }
-
-// Application state
-interface AppState {
-  currentPage: string;
-  user: {
-    alias: string | null;
-    id?: number;
-  };
-  isLoading: boolean;
-  error: string | null;
-}
-
-const state: AppState = {
-  currentPage: 'home',
-  user: {
-    alias: null
-  },
-  isLoading: false,
-  error: null
-};
-
-// Router
-const routes = {
-  home: renderHomePage,
-  register: renderRegisterPage,
-  tournament: renderTournamentPage
-};
-
-// Navigation
-function navigateTo(page: string): void {
-  // Update active link in navbar
-  document.querySelectorAll('.navbar-link').forEach(link => {
-    link.classList.remove('active');
-    if (link.textContent?.toLowerCase() === page) {
-      link.classList.add('active');
-    }
-  });
-  
-  state.currentPage = page;
-  window.history.pushState({ page }, '', `#${page}`);
-  renderApp();
-}
-
-// Handle browser back/forward
-window.addEventListener('popstate', (event) => {
-  if (event.state?.page) {
-    state.currentPage = event.state.page;
-    renderApp();
-  }
-});
 
 // Home Page
 function renderHomePage(): HTMLElement {
   const home = document.createElement('div');
   home.className = 'page home-page';
-  
+
   // Hero Section
   const heroSection = document.createElement('section');
   heroSection.className = 'hero-section';
-  
+
   const heroTitle = document.createElement('h1');
   heroTitle.className = 'hero-title';
-  heroTitle.textContent = 'Welcome to Pong Tournament';
-  
+  heroTitle.innerHTML = 'NEON PONG';
+
   const heroSubtitle = document.createElement('p');
   heroSubtitle.className = 'hero-subtitle';
-  heroSubtitle.textContent = 'Join the ultimate Pong experience and compete with players from around the world!';
-  
+  heroSubtitle.textContent = 'THE FUTURE OF';
+
+  const heroDescription = document.createElement('p');
+  heroDescription.className = 'hero-description';
+  heroDescription.textContent = 'PING PONG GAMING';
+
+  const heroCreatorInfo = document.createElement('p');
+  heroCreatorInfo.className = 'hero-description';
+  heroCreatorInfo.textContent = 'Created by Four Innovative Minds - Your Next-Level Pong Experience';
+
   const heroCta = document.createElement('div');
   heroCta.className = 'hero-cta';
-  
-  // Welcome message for registered users
-  if (state.user.alias) {
-    const welcomeMsg = document.createElement('div');
-    welcomeMsg.className = 'welcome-message';
-    welcomeMsg.textContent = `Welcome back, ${state.user.alias}!`;
-    heroSection.appendChild(welcomeMsg);
-  }
-  
-  const registerBtn = document.createElement('button');
-  registerBtn.className = 'primary-button';
-  registerBtn.textContent = state.user.alias ? 'Update Profile' : 'Register Now';
-  registerBtn.addEventListener('click', () => navigateTo('register'));
-  
-  const tournamentBtn = document.createElement('button');
-  tournamentBtn.className = 'secondary-button';
-  tournamentBtn.textContent = 'View Tournaments';
-  tournamentBtn.addEventListener('click', () => navigateTo('tournament'));
-  
-  heroCta.appendChild(registerBtn);
-  heroCta.appendChild(tournamentBtn);
-  
+
+  const playNowBtn = document.createElement('button');
+  playNowBtn.className = 'play-now-button';
+  playNowBtn.textContent = 'PLAY NOW';
+  playNowBtn.addEventListener('click', () => navigateTo('tournament'));
+
+  const registerCtaBtn = document.createElement('button');
+  registerCtaBtn.className = 'secondary-button';
+  registerCtaBtn.textContent = 'Register Now';
+  registerCtaBtn.addEventListener('click', () => navigateTo('register'));
+
+  heroCta.appendChild(playNowBtn);
+  heroCta.appendChild(registerCtaBtn);
+
+  const paddleImage = document.createElement('img');
+  paddleImage.src = '/ping.png'; // Make sure this path is correct relative to your project root
+  paddleImage.alt = 'Neon Ping Pong Paddle';
+  paddleImage.className = 'ping-pong-paddle';
+
   heroSection.appendChild(heroTitle);
   heroSection.appendChild(heroSubtitle);
+  heroSection.appendChild(heroDescription);
+  heroSection.appendChild(heroCreatorInfo);
   heroSection.appendChild(heroCta);
-  
+  heroSection.appendChild(paddleImage);
+
   home.appendChild(heroSection);
-  
-  // Content Section with Features
-  const contentSection = document.createElement('section');
-  contentSection.className = 'content-section';
-  
-  const sectionTitle = document.createElement('h2');
-  sectionTitle.className = 'section-title';
-  sectionTitle.textContent = 'Tournament Features';
-  contentSection.appendChild(sectionTitle);
-  
-  const cardContainer = document.createElement('div');
-  cardContainer.className = 'card-container';
-  
-  // Feature cards
-  const features = [
-    {
-      title: 'Real-time Matches',
-      content: 'Experience the thrill of real-time Pong matches with players from around the world.'
-    },
-    {
-      title: 'Tournament Rankings',
-      content: 'Climb the leaderboard and establish yourself as a top Pong player.'
-    },
-    {
-      title: 'Custom Tournaments',
-      content: 'Create and join custom tournaments with friends or the community.'
-    }
+
+  // --- START: Tournament Types Section (WITH CAROUSEL) ---
+  const tournamentTypesSection = document.createElement('section');
+  tournamentTypesSection.className = 'tournament-types-section';
+
+  const tournamentTypesTitle = document.createElement('h2');
+  tournamentTypesTitle.className = 'section-title';
+  tournamentTypesTitle.textContent = 'TYPES OF TOURNAMENTS';
+  tournamentTypesSection.appendChild(tournamentTypesTitle);
+
+  // Container for the scrollable grid and arrows
+  const tournamentCarouselContainer = document.createElement('div');
+  tournamentCarouselContainer.className = 'tournament-carousel-container';
+
+  const tournamentTypesGrid = document.createElement('div');
+  tournamentTypesGrid.className = 'tournament-types-grid';
+
+  const tournamentTypes = [
+    { icon: '&#x1F3C6;', title: 'Single Elimination', description: 'Classic knockout style, one loss and you\'re out!' },
+    { icon: '&#x2694;&#xFE0F;', title: 'Round Robin', description: 'Everyone plays everyone, test all your skills.' },
+    { icon: '&#x1F3AE;', title: 'Team Battles', description: 'Compete with your squad, for ultimate glory.' },
+    { icon: '&#x1F4BA;', title: 'Custom Rules', description: 'Unique formats and challenges, designed by the community.' },
+    { icon: '&#x1F3D3;', title: 'Arcade Mode', description: 'Fast-paced, high-score challenges!' }, // Example additional card
+    { icon: '&#x1F389;', title: 'Seasonal Events', description: 'Special limited-time tournaments with unique rewards!' } // Example additional card
   ];
-  
-  features.forEach(feature => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    
-    const cardTitle = document.createElement('h3');
-    cardTitle.className = 'card-title';
-    cardTitle.textContent = feature.title;
-    
-    const cardContent = document.createElement('p');
-    cardContent.className = 'card-content';
-    cardContent.textContent = feature.content;
-    
-    card.appendChild(cardTitle);
-    card.appendChild(cardContent);
-    
-    cardContainer.appendChild(card);
+
+  tournamentTypes.forEach(type => {
+    const typeCard = document.createElement('div');
+    typeCard.className = 'tournament-type-card';
+    typeCard.innerHTML = `
+      <span class="tournament-type-icon">${type.icon}</span>
+      <h3>${type.title}</h3>
+      <p>${type.description}</p>
+    `;
+    typeCard.addEventListener('click', () => navigateTo('tournament')); // Link to tournament page
+    tournamentTypesGrid.appendChild(typeCard);
   });
-  
-  contentSection.appendChild(cardContainer);
-  home.appendChild(contentSection);
-  
+
+  // Create Navigation Arrows
+  const leftArrow = document.createElement('button');
+  leftArrow.className = 'carousel-navigation left';
+  leftArrow.innerHTML = '&lsaquo;'; // Left arrow character
+  leftArrow.title = 'Scroll Left';
+
+  const rightArrow = document.createElement('button');
+  rightArrow.className = 'carousel-navigation right';
+  rightArrow.innerHTML = '&rsaquo;'; // Right arrow character
+  rightArrow.title = 'Scroll Right';
+
+  tournamentCarouselContainer.appendChild(leftArrow);
+  tournamentCarouselContainer.appendChild(tournamentTypesGrid);
+  tournamentCarouselContainer.appendChild(rightArrow);
+
+  tournamentTypesSection.appendChild(tournamentCarouselContainer);
+  home.appendChild(tournamentTypesSection);
+
+  // --- Carousel Logic (Event Listeners and Visibility) ---
+  const scrollStep = 340; // Approx. Card width (300px) + gap (32px = 2rem) + some buffer for smooth snapping
+
+  const updateArrowVisibility = () => {
+    // Hide left arrow if scrolled to the beginning
+    // Use a small tolerance (e.g., 5px) for scrollLeft due to sub-pixel rendering
+    if (tournamentTypesGrid.scrollLeft <= 5) {
+      leftArrow.classList.add('hidden');
+    } else {
+      leftArrow.classList.remove('hidden');
+    }
+
+    // Hide right arrow if scrolled to the end
+    // Check if remaining scrollable distance is very small
+    const atEnd = tournamentTypesGrid.scrollLeft + tournamentTypesGrid.clientWidth >= tournamentTypesGrid.scrollWidth - 5;
+    if (atEnd) {
+      rightArrow.classList.add('hidden');
+    } else {
+      rightArrow.classList.remove('hidden');
+    }
+  };
+
+  leftArrow.addEventListener('click', () => {
+    tournamentTypesGrid.scrollBy({
+      left: -scrollStep,
+      behavior: 'smooth'
+    });
+    // Give a small delay before updating visibility to allow smooth scroll to complete
+    setTimeout(updateArrowVisibility, 300);
+  });
+
+  rightArrow.addEventListener('click', () => {
+    tournamentTypesGrid.scrollBy({
+      left: scrollStep,
+      behavior: 'smooth'
+    });
+    // Give a small delay before updating visibility to allow smooth scroll to complete
+    setTimeout(updateArrowVisibility, 300);
+  });
+
+  // Update arrows on scroll (e.g., if user drags the scrollbar or uses touchpad)
+  tournamentTypesGrid.addEventListener('scroll', updateArrowVisibility);
+
+  // Initial update after rendering to set correct arrow visibility.
+  // Use setTimeout to ensure the DOM has rendered and calculated scrollWidth/clientWidth correctly.
+  setTimeout(updateArrowVisibility, 0);
+  // --- END: Tournament Types Section ---
+
+
+  // Meet The Team Section
+  const teamSection = document.createElement('section');
+  teamSection.className = 'content-section';
+
+  const teamTitle = document.createElement('h2');
+  teamTitle.className = 'section-title';
+  teamTitle.textContent = 'MEET THE TEAM';
+  teamSection.appendChild(teamTitle);
+
+  const teamGrid = document.createElement('div');
+  teamGrid.className = 'team-grid';
+
+  const teamMembers = [
+    { name: 'Developer 1', avatar: 'https://via.placeholder.com/100/00E6FF/FFFFFF?text=D1' }, // Placeholder
+    { name: 'Developer 2', avatar: 'https://via.placeholder.com/100/FF00FF/FFFFFF?text=D2' },
+    { name: 'Developer 3', avatar: 'https://via.placeholder.com/100/00E6FF/FFFFFF?text=D3' },
+    { name: 'Developer 4', avatar: 'https://via.placeholder.com/100/FF00FF/FFFFFF?text=D4' }
+  ];
+
+  teamMembers.forEach(member => {
+    const memberCard = document.createElement('div');
+    memberCard.className = 'team-member-card';
+
+    const avatar = document.createElement('img');
+    avatar.src = member.avatar;
+    avatar.alt = member.name;
+    avatar.className = 'team-member-avatar';
+
+    const name = document.createElement('p');
+    name.className = 'team-member-name';
+    name.textContent = member.name;
+
+    memberCard.appendChild(avatar);
+    memberCard.appendChild(name);
+    teamGrid.appendChild(memberCard);
+  });
+  teamSection.appendChild(teamGrid);
+  home.appendChild(teamSection);
+
+
   // Add footer
   home.appendChild(createFooter());
-  
+
   return home;
 }
+
+// Tournament Page (Placeholder)
+function renderTournamentPage(): HTMLElement {
+  const tournament = document.createElement('div');
+  tournament.className = 'page content-section';
+
+  const title = document.createElement('h1');
+  title.className = 'section-title';
+  title.textContent = 'Upcoming Tournaments';
+  tournament.appendChild(title);
+
+  const tournamentList = document.createElement('div');
+  tournamentList.className = 'tournament-list';
+
+  // Example tournament items
+  const tournaments = [
+    { name: 'Neon Cup 2025', status: 'Open', date: 'June 15, 2025', participants: 15, max: 32 },
+    { name: 'Rookie Rumble', status: 'In Progress', date: 'July 1, 2025', participants: 8, max: 16 },
+    { name: 'Master\'s Challenge', status: 'Completed', date: 'May 20, 2025', participants: 32, max: 32 }
+  ];
+
+  tournaments.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'tournament-item';
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '10px';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = t.name;
+    header.appendChild(h3);
+
+    const statusIndicator = document.createElement('span');
+    statusIndicator.className = `status-indicator status-${t.status.toLowerCase().replace(' ', '-')}`;
+    statusIndicator.title = `Status: ${t.status}`;
+    header.appendChild(statusIndicator);
+
+    item.appendChild(header);
+
+    const pDate = document.createElement('p');
+    pDate.textContent = `Date: ${t.date}`;
+    item.appendChild(pDate);
+
+    const pParticipants = document.createElement('p');
+    pParticipants.textContent = `Participants: ${t.participants}/${t.max}`;
+    item.appendChild(pParticipants);
+
+    const joinButton = document.createElement('button');
+    joinButton.className = 'primary-button';
+    joinButton.textContent = t.status === 'Open' ? 'Join Tournament' : (t.status === 'In Progress' ? 'View Details' : 'Results');
+    joinButton.disabled = t.status !== 'Open'; // Disable if not open
+
+    if (t.status === 'Completed') {
+        joinButton.classList.add('secondary-button'); // Style completed as secondary
+        joinButton.classList.remove('primary-button');
+    }
+
+    joinButton.addEventListener('click', () => {
+      if (t.status === 'Open') {
+        showMessage(`You joined the ${t.name}!`, 'success');
+        // Simulate joining by changing button text and status (in a real app, this would be backend)
+        joinButton.textContent = 'Joined';
+        joinButton.disabled = true;
+        joinButton.classList.add('joined'); // Add a class for joined state styling
+      } else {
+        showMessage(`Viewing details for ${t.name}`, 'success');
+        // Navigate to tournament details page
+      }
+    });
+    item.appendChild(joinButton);
+
+    tournamentList.appendChild(item);
+  });
+
+  tournament.appendChild(tournamentList);
+  tournament.appendChild(createFooter()); // Add footer to the tournament page
+  return tournament;
+}
+
 
 // Register Page
 function renderRegisterPage(): HTMLElement {
   const register = document.createElement('div');
-  register.className = 'page register-page';
-  
-  // Content Section
-  const contentSection = document.createElement('section');
-  contentSection.className = 'content-section';
-  
-  const sectionTitle = document.createElement('h2');
-  sectionTitle.className = 'section-title';
-  sectionTitle.textContent = state.user.alias ? 'Update Your Profile' : 'Register for Tournament';
-  contentSection.appendChild(sectionTitle);
-  
-  // Form Container
+  register.className = 'page content-section';
+
   const formContainer = document.createElement('div');
   formContainer.className = 'form-container';
-  
+
+  const title = document.createElement('h2');
+  title.className = 'form-title';
+  title.textContent = 'Register for Neon Pong';
+  formContainer.appendChild(title);
+
   const form = document.createElement('form');
-  form.className = 'register-form';
-  form.addEventListener('submit', async (e) => {
+
+  // Username
+  const usernameLabel = document.createElement('label');
+  usernameLabel.className = 'form-label';
+  usernameLabel.htmlFor = 'username';
+  usernameLabel.textContent = 'Username';
+  form.appendChild(usernameLabel);
+
+  const usernameInput = document.createElement('input');
+  usernameInput.type = 'text';
+  usernameInput.id = 'username';
+  usernameInput.className = 'form-input';
+  usernameInput.placeholder = 'Choose a unique username';
+  usernameInput.required = true;
+  form.appendChild(usernameInput);
+
+  // Email
+  const emailLabel = document.createElement('label');
+  emailLabel.className = 'form-label';
+  emailLabel.htmlFor = 'email';
+  emailLabel.textContent = 'Email';
+  form.appendChild(emailLabel);
+
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.id = 'email';
+  emailInput.className = 'form-input';
+  emailInput.placeholder = 'Enter your email';
+  emailInput.required = true;
+  form.appendChild(emailInput);
+
+  // Password
+  const passwordLabel = document.createElement('label');
+  passwordLabel.className = 'form-label';
+  passwordLabel.htmlFor = 'password';
+  passwordLabel.textContent = 'Password';
+  form.appendChild(passwordLabel);
+
+  const passwordInput = document.createElement('input');
+  passwordInput.type = 'password';
+  passwordInput.id = 'password';
+  passwordInput.className = 'form-input';
+  passwordInput.placeholder = 'Create a strong password';
+  passwordInput.required = true;
+  form.appendChild(passwordInput);
+
+  // Confirm Password
+  const confirmPasswordLabel = document.createElement('label');
+  confirmPasswordLabel.className = 'form-label';
+  confirmPasswordLabel.htmlFor = 'confirmPassword';
+  confirmPasswordLabel.textContent = 'Confirm Password';
+  form.appendChild(confirmPasswordLabel);
+
+  const confirmPasswordInput = document.createElement('input');
+  confirmPasswordInput.type = 'password';
+  confirmPasswordInput.id = 'confirmPassword';
+  confirmPasswordInput.className = 'form-input';
+  confirmPasswordInput.placeholder = 'Re-enter your password';
+  confirmPasswordInput.required = true;
+  form.appendChild(confirmPasswordInput);
+
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.className = 'primary-button';
+  submitButton.textContent = 'Register Account';
+  form.appendChild(submitButton);
+
+  const backButton = document.createElement('button');
+  backButton.type = 'button'; // Important: type="button" to prevent form submission
+  backButton.className = 'secondary-button back-button';
+  backButton.textContent = 'Back to Home';
+  backButton.addEventListener('click', () => navigateTo('/'));
+  form.appendChild(backButton);
+
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const aliasInput = document.getElementById('alias') as HTMLInputElement;
-    const alias = aliasInput.value.trim();
-    
-    // Form validation
-    if (alias.length < 3) {
-      showError('Alias must be at least 3 characters');
-      return;
-    }
-    
-    // Show loading state
-    state.isLoading = true;
-    renderApp();
-    
-    try {
-      // Call API service
-      const response = await apiService.users.register(alias);
-      
-      if (response.error) {
-        showError(response.error);
-        return;
+    showLoading();
+    // Simulate API call
+    setTimeout(() => {
+      hideLoading();
+      if (usernameInput.value && emailInput.value && passwordInput.value === confirmPasswordInput.value) {
+        showMessage('Registration successful! Welcome to Neon Pong.', 'success');
+        form.reset(); // Clear form
+        navigateTo('/'); // Go back to home or a dashboard
+      } else {
+        showMessage('Registration failed. Please check your inputs, especially passwords.', 'error');
       }
-      
-      if (response.data) {
-        // Save to state
-        state.user.alias = response.data.alias;
-        state.user.id = response.data.id;
-        showSuccess('Registration successful!');
-        
-        // Navigate to home after delay
-        setTimeout(() => navigateTo('home'), 1500);
-      }
-    } catch (error) {
-      showError('An unexpected error occurred');
-    } finally {
-      state.isLoading = false;
-      renderApp();
-    }
+    }, 1500); // Simulate network delay
   });
-  
-  // Form Group
-  const formGroup = document.createElement('div');
-  formGroup.className = 'form-group';
-  
-  const aliasLabel = document.createElement('label');
-  aliasLabel.setAttribute('for', 'alias');
-  aliasLabel.className = 'form-label';
-  aliasLabel.textContent = 'Your Alias:';
-  
-  const aliasInput = document.createElement('input');
-  aliasInput.type = 'text';
-  aliasInput.id = 'alias';
-  aliasInput.className = 'form-input';
-  aliasInput.required = true;
-  aliasInput.minLength = 3;
-  aliasInput.value = state.user.alias || '';
-  aliasInput.placeholder = 'Enter your alias (min 3 characters)';
-  
-  formGroup.appendChild(aliasLabel);
-  formGroup.appendChild(aliasInput);
-  form.appendChild(formGroup);
-  
-  // Button Group
-  const buttonGroup = document.createElement('div');
-  buttonGroup.className = 'button-group';
-  
-  const submitBtn = document.createElement('button');
-  submitBtn.type = 'submit';
-  submitBtn.className = 'primary-button';
-  submitBtn.textContent = state.user.alias ? 'Update' : 'Register';
-  submitBtn.disabled = state.isLoading;
-  
-  const backBtn = document.createElement('button');
-  backBtn.type = 'button';
-  backBtn.className = 'secondary-button';
-  backBtn.textContent = 'Back to Home';
-  backBtn.addEventListener('click', () => navigateTo('home'));
-  
-  buttonGroup.appendChild(submitBtn);
-  buttonGroup.appendChild(backBtn);
-  form.appendChild(buttonGroup);
-  
+
   formContainer.appendChild(form);
-  contentSection.appendChild(formContainer);
-  
-  // Error and Success Messages
-  const errorMsg = document.createElement('div');
-  errorMsg.className = 'message error-message';
-  errorMsg.id = 'error-message';
-  errorMsg.style.display = 'none';
-  contentSection.appendChild(errorMsg);
-  
-  const successMsg = document.createElement('div');
-  successMsg.className = 'message success-message';
-  successMsg.id = 'success-message';
-  successMsg.style.display = 'none';
-  contentSection.appendChild(successMsg);
-  
-  // Loading Indicator
-  if (state.isLoading) {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.className = 'loading-overlay';
-    
-    const spinner = document.createElement('div');
-    spinner.className = 'spinner';
-    
-    const loadingText = document.createElement('div');
-    loadingText.className = 'loading-text';
-    loadingText.textContent = 'Processing...';
-    
-    loadingOverlay.appendChild(spinner);
-    loadingOverlay.appendChild(loadingText);
-    
-    register.appendChild(loadingOverlay);
-  }
-  
-  register.appendChild(contentSection);
+  register.appendChild(formContainer);
   register.appendChild(createFooter());
-  
   return register;
 }
 
-// Tournament Page
-function renderTournamentPage(): HTMLElement {
-  const tournament = document.createElement('div');
-  tournament.className = 'page tournament-page';
-  
-  // Content Section
-  const contentSection = document.createElement('section');
-  contentSection.className = 'content-section';
-  
-  // Header with title and refresh button
-  const header = document.createElement('div');
-  header.className = 'page-header';
-  
-  const title = document.createElement('h2');
-  title.className = 'section-title';
-  title.textContent = 'Tournaments';
-  
-  const refreshBtn = document.createElement('button');
-  refreshBtn.className = 'secondary-button refresh-button';
-  refreshBtn.innerHTML = '<span>↻</span> Refresh';
-  refreshBtn.addEventListener('click', () => {
-    loadTournaments(contentSection);
-  });
-  
-  header.appendChild(title);
-  header.appendChild(refreshBtn);
-  contentSection.appendChild(header);
-  
-  // Loading indicator
-  const loading = document.createElement('div');
-  loading.className = 'loading';
-  loading.style.marginTop = '1rem';
-  loading.innerHTML = '<div class="spinner"></div><p>Loading tournaments...</p>';
-  contentSection.appendChild(loading);
-  
-  // Load tournaments (initial load)
-  loadTournaments(contentSection);
-  
-  tournament.appendChild(contentSection);
-  tournament.appendChild(createFooter());
-  
-  return tournament;
-}
+// Router setup function
+function setupRoutes(app: HTMLElement) {
+  const path = window.location.pathname;
 
-// Load tournaments with API integration
-async function loadTournaments(container: HTMLElement): Promise<void> {
-  // Clear previous tournament list if exists
-  const existingList = container.querySelector('.tournament-list');
-  if (existingList) {
-    container.removeChild(existingList);
-  }
-  
-  // Show loading
-  const loading = container.querySelector('.loading') as HTMLElement;
-  if (loading) {
-    loading.style.display = 'flex';
-  }
-  
-  try {
-    // Call API service
-    const response = await apiService.tournaments.getAll();
-    
-    if (loading) {
-      loading.style.display = 'none';
-    }
-    
-    if (response.error) {
-      const errorDisplay = document.createElement('div');
-      errorDisplay.className = 'message error-message';
-      errorDisplay.textContent = `Error loading tournaments: ${response.error}`;
-      container.appendChild(errorDisplay);
-      return;
-    }
-    
-    if (!response.data || response.data.length === 0) {
-      const emptyState = document.createElement('div');
-      emptyState.className = 'empty-state';
-      emptyState.textContent = 'No tournaments available at this time.';
-      container.appendChild(emptyState);
-      return;
-    }
-    
-    // Create tournament list
-    renderTournamentList(container, response.data);
-    
-  } catch (error) {
-    if (loading) {
-      loading.style.display = 'none';
-    }
-    
-    const errorDisplay = document.createElement('div');
-    errorDisplay.className = 'message error-message';
-    errorDisplay.textContent = 'Failed to load tournaments. Please try again.';
-    container.appendChild(errorDisplay);
-  }
-}
+  // Clear existing content and active classes
+  app.innerHTML = '';
+  const existingNavbar = document.querySelector('.navbar');
+  if (existingNavbar) existingNavbar.remove();
 
-// Render tournament list
-function renderTournamentList(container: HTMLElement, tournaments: Tournament[]): void {
-  const tournamentList = document.createElement('div');
-  tournamentList.className = 'tournament-list';
-  
-  tournaments.forEach(t => {
-    const item = document.createElement('div');
-    item.className = 'tournament-item';
-    
-    const header = document.createElement('div');
-    header.className = 'tournament-header';
-    
-    const title = document.createElement('h3');
-    title.textContent = t.name;
-    
-    const status = document.createElement('div');
-    status.className = `status-indicator status-${t.status.toLowerCase()}`;
-    
-    header.appendChild(title);
-    header.appendChild(status);
-    
-    const details = document.createElement('div');
-    details.className = 'tournament-details';
-    details.innerHTML = `
-      <p>Players: ${t.players.length}/${t.maxPlayers}</p>
-      <p>Status: ${t.status}</p>
-    `;
-    
-    const joinBtn = document.createElement('button');
-    joinBtn.className = 'primary-button join-button';
-    joinBtn.textContent = t.status === 'Open' ? 'Join Tournament' : 'Tournament Full';
-    joinBtn.disabled = t.status !== 'Open';
-    
-    if (t.status === 'Open') {
-      joinBtn.addEventListener('click', async () => {
-        joinBtn.disabled = true;
-        joinBtn.textContent = 'Joining...';
-        
-        try {
-          const response = await apiService.tournaments.join(t.id);
-          
-          if (response.error) {
-            showError(response.error);
-            joinBtn.textContent = 'Try Again';
-            joinBtn.disabled = false;
-            return;
-          }
-          
-          if (response.data && response.data.success) {
-            joinBtn.textContent = 'Joined';
-            joinBtn.className = 'primary-button join-button joined';
-            showSuccess('Successfully joined tournament!');
-          }
-        } catch (error) {
-          joinBtn.textContent = 'Try Again';
-          joinBtn.disabled = false;
-          showError('Failed to join tournament');
-        }
-      });
-    }
-    
-    item.appendChild(header);
-    item.appendChild(details);
-    item.appendChild(joinBtn);
-    
-    tournamentList.appendChild(item);
-  });
-  
-  container.appendChild(tournamentList);
-  
-  // Add back button if not exists
-  const existingBackBtn = container.querySelector('.back-button');
-  if (!existingBackBtn) {
-    const backBtn = document.createElement('button');
-    backBtn.className = 'secondary-button back-button';
-    backBtn.textContent = 'Back to Home';
-    backBtn.addEventListener('click', () => navigateTo('home'));
-    container.appendChild(backBtn);
-  }
-}
-// Helper functions
-function showError(message: string): void {
-  state.error = message;
-  const errorElement = document.getElementById('error-message');
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-    
-    // Add close button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'message-close';
-    closeBtn.innerHTML = '&times;';
-    closeBtn.addEventListener('click', () => {
-      errorElement.style.display = 'none';
-      state.error = null;
-    });
-    
-    errorElement.appendChild(closeBtn);
-    
-    setTimeout(() => {
-      errorElement.style.display = 'none';
-      state.error = null;
-    }, 5000);
-  }
-}
+  app.appendChild(createNavbar()); // Add navbar to every page
 
-function showSuccess(message: string): void {
-  const successElement = document.getElementById('success-message');
-  if (successElement) {
-    successElement.textContent = message;
-    successElement.style.display = 'block';
-    
-    // Add close button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'message-close';
-    closeBtn.innerHTML = '&times;';
-    closeBtn.addEventListener('click', () => {
-      successElement.style.display = 'none';
-    });
-    
-    successElement.appendChild(closeBtn);
-    
-    setTimeout(() => {
-      successElement.style.display = 'none';
-    }, 5000);
+  switch (path) {
+    case '/':
+      app.appendChild(renderHomePage());
+      break;
+    case '/tournament':
+      app.appendChild(renderTournamentPage());
+      break;
+    case '/register':
+      app.appendChild(renderRegisterPage());
+      break;
+    default:
+      // Basic 404 page
+      const notFound = document.createElement('div');
+      notFound.className = 'page content-section';
+      notFound.innerHTML = '<h1 class="section-title">404 - Page Not Found</h1><p style="text-align:center; color: var(--text-color-light);">The page you are looking for does not exist.</p>';
+      const backHomeBtn = document.createElement('button');
+      backHomeBtn.className = 'primary-button back-button';
+      backHomeBtn.textContent = 'Go to Home';
+      backHomeBtn.addEventListener('click', () => navigateTo('/'));
+      notFound.appendChild(backHomeBtn);
+      notFound.appendChild(createFooter());
+      app.appendChild(notFound);
+      break;
   }
-}
 
-// Main render function
-function renderApp(): void {
-  // Clear the app container
-  while (appElement.firstChild) {
-    appElement.removeChild(appElement.firstChild);
-  }
-  
-  // Add navbar
-  appElement.appendChild(createNavbar());
-  
-  // Update active link in navbar
+  // Update active navbar link after page render
+  const currentPath = window.location.pathname;
   document.querySelectorAll('.navbar-link').forEach(link => {
     link.classList.remove('active');
-    if (link.textContent?.toLowerCase() === state.currentPage) {
+    if (link.getAttribute('href') === currentPath) {
       link.classList.add('active');
     }
   });
-  
-  // Get the current route renderer
-  const renderer = routes[state.currentPage as keyof typeof routes];
-  
-  if (renderer) {
-    const pageElement = renderer();
-    appElement.appendChild(pageElement);
-  } else {
-    // Fallback to home if route not found
-    state.currentPage = 'home';
-    appElement.appendChild(renderHomePage());
-  }
 }
 
-// Initialize the app
-function initApp(): void {
-  // Check for hash in URL
-  const hash = window.location.hash.substring(1);
-  if (hash && Object.keys(routes).includes(hash)) {
-    state.currentPage = hash;
+// Initial page load
+document.addEventListener('DOMContentLoaded', () => {
+  const app = document.getElementById('app');
+  if (app) {
+    setupRoutes(app);
   }
-  
-  // Add app version class for styling
-  document.body.classList.add('app-v1');
-  
-  renderApp();
-}
+});
 
-// Start the application
-document.addEventListener('DOMContentLoaded', initApp);
+// Handle browser history changes (back/forward buttons)
+window.addEventListener('popstate', () => {
+  const app = document.getElementById('app');
+  if (app) {
+    setupRoutes(app);
+  }
+});

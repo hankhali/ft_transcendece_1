@@ -1,20 +1,30 @@
-/* Enhanced CSS styles for the SPA with feminine, futuristic aesthetic */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #8E44AD;
-  --secondary-color: #6C5CE7;
-  --accent-color: #FAD0C4;
-  --accent-color-2: #FFC3A0;
-  --background-color: #F9F9FB;
-  --text-color: #2D2D2D;
-  --text-color-light: #888888;
-  --white: #FFFFFF;
+  /* Adjusted for Dark Theme & Neon Glow */
+  --primary-color: #00E6FF; /* Neon Blue */
+  --secondary-color: #FF00FF; /* Neon Pink/Magenta */
+  --accent-color: #FF6B6B; /* Retaining for general accents if needed */
+  --accent-color-2: #FFC3A0; /* Retaining */
+
+  --background-color: #080820; /* Very dark blue/purple */
+  --text-color: #E0E0FF; /* Light, slightly blue-ish text */
+  --text-color-light: #AAAAFF; /* Lighter text for subtitles */
+  --white: #FFFFFF; /* Pure white, used sparingly */
   --error-color: #FF6B6B;
   --success-color: #66BB6A;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Neon Glow Effect */
+  --neon-blue-glow: 0 0 10px #00E6FF, 0 0 20px #00E6FF, 0 0 30px #00E6FF, 0 0 40px #00E6FF;
+  --neon-pink-glow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF, 0 0 40px #FF00FF;
+  --neon-gradient-glow: 0 0 10px rgba(0, 230, 255, 0.7), 0 0 20px rgba(255, 0, 255, 0.7);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); /* Less prominent in dark theme */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adjusted for contrast */
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25); /* Adjusted for contrast */
+
   --border-radius-sm: 8px;
   --border-radius-md: 16px;
   --border-radius-lg: 24px;
@@ -38,6 +48,9 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  background-image: radial-gradient(circle at 10% 20%, rgba(0, 230, 255, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
 }
 
 /* Typography */
@@ -45,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--primary-color);
+  color: var(--primary-color); /* Default for headers, will override some */
 }
 
 h1 {
@@ -81,107 +94,82 @@ p {
   flex-direction: column;
   animation: fadeIn 0.5s ease-in-out;
   padding: 0;
-  margin-top: 70px; /* Space for fixed navbar */
+  margin-top: 70px; /* IMPORTANT: Ensures page content is below fixed navbar */
 }
 
-/* Navigation */
+/* Navigation - Adjusted to be visible and centered */
 .navbar {
-  position: fixed;
+  position: fixed; /* Keep fixed to stay at top */
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(8, 8, 32, 0.8); /* Semi-transparent dark background */
+  backdrop-filter: blur(8px); /* Add blur for a modern look */
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* CENTER NAV LINKS */
   align-items: center;
   padding: 0 2rem;
   z-index: 1000;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md), 0 0 10px rgba(0, 230, 255, 0.1); /* Subtle glow on navbar */
   transition: all var(--transition-normal);
 }
 
 .navbar-logo {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--primary-color);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-.navbar-logo span {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  display: none; /* HIDE THE LOGO COMPLETELY */
 }
 
 .navbar-links {
-  display: flex;
-  gap: 2rem;
+  display: flex; /* Make links visible */
+  gap: 1.5rem;
 }
 
 .navbar-link {
-  color: var(--text-color);
+  color: var(--text-color-light);
   text-decoration: none;
   font-weight: 500;
-  position: relative;
+  font-size: 1.1rem; /* Slightly larger for prominence */
   padding: 0.5rem 0;
-  transition: color var(--transition-fast);
+  position: relative;
+  transition: all var(--transition-fast);
+  text-shadow: 0 0 5px rgba(0, 230, 255, 0.2);
 }
 
 .navbar-link:hover {
   color: var(--primary-color);
+  text-shadow: var(--neon-blue-glow);
+  transform: translateY(-2px);
 }
 
 .navbar-link.active {
   color: var(--primary-color);
+  text-shadow: var(--neon-blue-glow);
 }
 
 .navbar-link.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -5px;
   left: 0;
   width: 100%;
   height: 2px;
   background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  transform: scaleX(1);
-  transform-origin: left;
-  transition: transform var(--transition-normal);
+  box-shadow: var(--neon-gradient-glow);
+  border-radius: var(--border-radius-full);
 }
 
-.navbar-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-normal);
-}
 
-.navbar-link:hover::after {
-  transform: scaleX(1);
-}
-
-/* Hero Section */
+/* Hero Section - This will be the main 'Neon Pong' section */
 .hero-section {
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px); /* Takes full viewport height minus navbar */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Align content to the top */
   align-items: center;
   text-align: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, rgba(142, 68, 173, 0.05), rgba(108, 92, 231, 0.1));
+  padding: 8rem 2rem 4rem; /* More padding at top */
+  background: transparent; /* Background handled by body */
   position: relative;
   overflow: hidden;
 }
@@ -193,119 +181,341 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 30% 70%, rgba(250, 208, 196, 0.2), transparent 50%),
-              radial-gradient(circle at 70% 30%, rgba(108, 92, 231, 0.1), transparent 50%);
+  /* Subtle radial gradients from the screenshot */
+  background: radial-gradient(circle at 20% 10%, rgba(0, 230, 255, 0.08), transparent 50%),
+              radial-gradient(circle at 80% 90%, rgba(255, 0, 255, 0.08), transparent 50%);
   z-index: -1;
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5rem;
   margin-bottom: 1.5rem;
-  animation: fadeInUp 0.8s ease-out;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  animation: neonGlowPulse 1.5s ease-in-out infinite alternate;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  text-shadow: var(--neon-blue-glow);
+  font-weight: 700;
+}
+.hero-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  max-width: 600px;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(0, 230, 255, 0.5), 0 0 15px rgba(0, 230, 255, 0.3);
 }
 
-.hero-subtitle {
-  font-size: 1.5rem;
+.hero-description { /* New style for the descriptive text under the subtitle */
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.15rem;
   color: var(--text-color-light);
   margin-bottom: 2.5rem;
-  max-width: 700px;
-  animation: fadeInUp 0.8s ease-out 0.2s both;
+  max-width: 500px;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.4), 0 0 10px rgba(255, 0, 255, 0.2);
 }
+
 
 .hero-cta {
   animation: fadeInUp 0.8s ease-out 0.4s both;
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.play-now-button {
+  background: linear-gradient(90deg, #FF00FF 0%, #00E6FF 100%); /* Neon gradient */
+  color: var(--white);
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: var(--border-radius-full);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7); /* Double glow */
+  animation: pulseButton 1.5s infinite alternate; /* Pulsing effect */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--transition-normal);
+}
+
+.play-now-button:hover {
+  background: linear-gradient(90deg, #00E6FF 0%, #FF00FF 100%);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.9), 0 0 40px rgba(0, 230, 255, 0.9);
+  transform: translateY(-3px) scale(1.02);
+  border-color: transparent; /* Set to transparent to ensure no visible border on hover */
+}
+
+.play-now-button:active {
+  transform: translateY(0);
+  box-shadow: var(--neon-gradient-glow);
+}
+
+/* Ping Pong Paddle Image */
+.ping-pong-paddle {
+  position: absolute;
+  top: 5%; /* Adjust positioning based on screen size */
+  right: 5%;
+  width: 400px; /* Adjust size as needed */
+  height: auto;
+  filter: drop-shadow(0 0 25px var(--primary-color)) drop-shadow(0 0 40px var(--secondary-color));
+  animation: floatPaddle 3s ease-in-out infinite alternate;
+  z-index: -1;
+  opacity: 0.8;
 }
 
 /* Content Section */
 .content-section {
   padding: 4rem 2rem;
-  max-width: 1200px;
+  max-width: 1000px; /* Adjusted max-width */
   margin: 0 auto;
   width: 100%;
 }
 
 .section-title {
-  text-align: center;
-  margin-bottom: 3rem;
+  text-align: left; /* Aligned left as in screenshot */
+  margin-bottom: 2rem;
   position: relative;
+  font-size: 1.8rem; /* Slightly smaller for internal sections */
+  color: var(--white); /* White for main section titles */
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: var(--neon-blue-glow);
 }
 
 .section-title::after {
   content: '';
   position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
+  bottom: -5px; /* Adjust position */
+  left: 0; /* Align to left */
+  transform: none; /* No translateX */
+  width: 80px; /* Wider line */
+  height: 2px; /* Thinner line */
   background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
   border-radius: var(--border-radius-full);
+  box-shadow: var(--neon-gradient-glow);
 }
 
-/* Cards */
-.card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+/* About Project Section Specifics (Removed from home page, but keeping styles if used elsewhere) */
+.about-project-content {
+  display: flex;
   gap: 2rem;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.about-project-text {
+  flex: 1;
+  text-align: left;
+  color: var(--text-color-light);
+}
+
+.about-project-text p {
+  margin-bottom: 1rem;
+}
+
+.about-project-icon {
+  font-size: 3rem; /* Example size for icon */
+  color: var(--primary-color);
+  margin-right: 1rem;
+  vertical-align: middle;
+  text-shadow: var(--neon-blue-glow);
+}
+
+.about-project-image-frame {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+  height: 200px; /* Fixed height for consistency */
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  box-shadow: var(--neon-gradient-glow);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius-md);
+}
+
+.about-project-image-frame img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain; /* Ensure image fits */
+  filter: brightness(1.5) saturate(1.5); /* Enhance neon effect */
+}
+
+
+/* Features Section (Removed from home page, but keeping styles if used elsewhere) */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
   margin: 2rem 0;
 }
 
-.card {
-  background-color: var(--white);
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
-  padding: 2rem;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+.feature-button { /* New class for the feature buttons */
+  background: rgba(0, 0, 0, 0.3); /* Transparent background for inner elements */
+  color: var(--text-color);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  border-radius: var(--border-radius-sm);
+  padding: 1.2rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all var(--transition-normal);
+  box-shadow: var(--neon-gradient-glow); /* Initial glow */
+  cursor: pointer;
+}
+
+.feature-button:hover {
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 20px rgba(0, 230, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.8);
+  transform: translateY(-5px) scale(1.02);
+}
+
+/* Meet the Team Section */
+.team-grid {
+  display: flex; /* Using flexbox for horizontal scroll if many members */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  gap: 2rem;
+  margin: 2rem 0;
+  padding-bottom: 1rem; /* Add padding for scrollbar */
+  justify-content: center; /* Center items if they don't overflow */
+}
+
+.team-member-card {
+  flex-shrink: 0; /* Prevent shrinking */
+  text-align: center;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
+  align-items: center;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
+.team-member-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid;
+  border-image: linear-gradient(45deg, var(--secondary-color), var(--primary-color)) 1;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 20px rgba(0, 230, 255, 0.7); /* Neon glow */
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.team-member-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.9), 0 0 30px rgba(0, 230, 255, 0.9);
+}
+
+.team-member-name {
+  margin-top: 0.8rem;
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  text-shadow: 0 0 5px rgba(0, 230, 255, 0.3);
+}
+
+/* Tournament Types Section (New Section on Home Page) */
+.tournament-types-section {
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the whole carousel container */
   width: 100%;
-  height: 4px;
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-normal);
+  box-sizing: border-box;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+.tournament-carousel-container {
+    position: relative; /* Needed for absolute positioning of arrows */
+    width: 95%; /* Adjust width for desktop views */
+    max-width: 1200px; /* Max width for the carousel */
+    margin-top: 1.5rem; /* Space from title */
+    display: flex;
+    align-items: center; /* Vertically align arrows with grid */
+    padding: 0 20px; /* Space for arrows */
+    box-sizing: border-box;
 }
 
-.card:hover::before {
-  transform: scaleX(1);
+.tournament-types-grid {
+    display: flex; /* Changed to flex */
+    flex-wrap: nowrap; /* Prevent wrapping onto next line */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-snap-type: x mandatory; /* Snap to beginning of items */
+    gap: 2rem; /* Space between cards */
+    padding-bottom: 1rem; /* Space for scrollbar if present */
+    width: 100%; /* Take full width of its parent (.tournament-carousel-container) */
+    /* Hide scrollbar visually but keep functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+.tournament-types-grid::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
-.card-title {
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+.tournament-type-card {
+    flex: 0 0 auto; /* Prevent cards from growing or shrinking, keep their defined width */
+    width: 300px; /* Fixed width for each card, adjust as needed */
+    scroll-snap-align: start; /* Snap point at the start of each card */
+
+    /* Keep existing styles */
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
+    border: 2px solid;
+    border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neon-gradient-glow);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.card-content {
-  flex: 1;
-  margin-bottom: 1.5rem;
+.tournament-type-card:hover {
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 230, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.8);
+    transform: translateY(-5px) scale(1.02);
 }
 
-.card-footer {
-  margin-top: auto;
+.tournament-type-card h3 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    text-shadow: var(--neon-blue-glow);
 }
 
-/* Buttons */
+.tournament-type-card p {
+    font-size: 0.95rem;
+    color: var(--text-color-light);
+    margin-bottom: 0;
+}
+
+.tournament-type-icon {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    text-shadow: var(--neon-pink-glow);
+    margin-bottom: 0.5rem;
+}
+
+
+/* Buttons - General adjustments for neon theme */
 button {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
@@ -323,29 +533,32 @@ button {
 
 .primary-button {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: white;
-  box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+  color: var(--white);
+  box-shadow: var(--neon-gradient-glow);
+  margin-bottom: 1.5rem; /* ADD THIS LINE: Creates space below the button */
 }
 
 .primary-button:hover {
-  box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+  box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color);
   transform: translateY(-2px);
 }
 
 .primary-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(142, 68, 173, 0.3);
+  box-shadow: var(--neon-gradient-glow);
 }
 
 .secondary-button {
   background-color: transparent;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
+  box-shadow: var(--neon-blue-glow);
 }
 
 .secondary-button:hover {
-  background-color: rgba(142, 68, 173, 0.05);
+  background-color: rgba(0, 230, 255, 0.1);
   transform: translateY(-2px);
+  box-shadow: 0 0 20px var(--primary-color);
 }
 
 .secondary-button:active {
@@ -353,59 +566,60 @@ button {
 }
 
 button:disabled {
-  background: #CCCCCC;
-  color: #888888;
+  background: #222;
+  color: #555;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+  border: 1px solid #333;
 }
 
-/* Forms */
+/* Forms (Register Page) - Adapted for dark theme */
 .form-container {
   max-width: 500px;
   margin: 0 auto;
   width: 100%;
-  background-color: var(--white);
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), var(--neon-gradient-glow); /* Add glow */
   padding: 2.5rem;
+  border: 1px solid rgba(0, 230, 255, 0.2); /* Subtle neon border */
 }
 
 .form-title {
   text-align: center;
   margin-bottom: 2rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-  position: relative;
+  color: var(--white);
+  text-shadow: var(--neon-blue-glow);
 }
 
 .form-label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--text-color-light);
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #E0E0E0;
+  border: 2px solid rgba(0, 230, 255, 0.3);
   border-radius: var(--border-radius-sm);
   font-size: 1rem;
   transition: all var(--transition-fast);
-  background-color: var(--white);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: var(--text-color);
+  margin-bottom: 1.5rem; /* ADD THIS LINE: Space after the input field */
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 230, 255, 0.3), var(--neon-blue-glow);
 }
 
 .form-input::placeholder {
-  color: #BBBBBB;
+  color: #7777AA;
 }
 
 .form-error {
@@ -413,88 +627,56 @@ button:disabled {
   font-size: 0.875rem;
   margin-top: 0.5rem;
   display: block;
-}
-
-.button-group {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  justify-content: center;
+  text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
 }
 
 /* Loading States */
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  animation: fadeIn 0.3s ease;
+  background-color: rgba(8, 8, 32, 0.9); /* Darker overlay */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(142, 68, 173, 0.1);
-  border-radius: 50%;
+  border: 4px solid rgba(0, 230, 255, 0.2);
   border-top-color: var(--primary-color);
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  box-shadow: var(--neon-blue-glow);
 }
 
 .loading-text {
-  font-family: 'Poppins', sans-serif;
   color: var(--primary-color);
-  font-weight: 500;
+  text-shadow: var(--neon-blue-glow);
 }
 
 /* Messages */
 .message {
   padding: 1rem;
   border-radius: var(--border-radius-sm);
-  margin: 1rem 0;
+  margin: 1rem auto; /* Center messages */
+  width: fit-content; /* Fit to content width */
   animation: slideIn 0.3s ease;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: var(--shadow-md); /* Add shadow */
 }
 
 .error-message {
   background-color: rgba(255, 107, 107, 0.1);
   border-left: 4px solid var(--error-color);
   color: var(--error-color);
+  text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
 }
 
 .success-message {
   background-color: rgba(102, 187, 106, 0.1);
   border-left: 4px solid var(--success-color);
   color: var(--success-color);
+  text-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
 }
 
-.message-close {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: inherit;
-  padding: 0.25rem;
-  opacity: 0.7;
-  transition: opacity var(--transition-fast);
-}
-
-.message-close:hover {
-  opacity: 1;
-}
-
-/* Tournament List */
+/* Tournament List - Using generic card styles */
 .tournament-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -503,7 +685,7 @@ button:disabled {
 }
 
 .tournament-item {
-  background-color: var(--white);
+  background-color: rgba(0, 0, 0, 0.3); /* Darker background */
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
@@ -512,23 +694,17 @@ button:disabled {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(0, 230, 255, 0.1); /* Subtle neon border */
 }
 
 .tournament-item:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
-}
-
-.tournament-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  box-shadow: var(--shadow-lg), var(--neon-gradient-glow); /* Add glow on hover */
 }
 
 .tournament-item h3 {
-  margin: 0;
   color: var(--primary-color);
+  text-shadow: 0 0 8px rgba(0, 230, 255, 0.5);
 }
 
 .status-indicator {
@@ -536,59 +712,78 @@ button:disabled {
   height: 12px;
   border-radius: 50%;
   background-color: #95a5a6;
+  box-shadow: 0 0 5px #95a5a6; /* Add glow to status */
 }
 
 .status-open {
   background-color: var(--success-color);
-  box-shadow: 0 0 10px rgba(102, 187, 106, 0.5);
+  box-shadow: 0 0 10px rgba(102, 187, 106, 0.8);
 }
 
 .status-in-progress {
   background-color: #f39c12;
-  box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+  box-shadow: 0 0 10px rgba(243, 156, 18, 0.8);
 }
 
 .status-completed {
   background-color: var(--secondary-color);
-  box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
-}
-
-.join-button {
-  margin-top: auto;
-  width: 100%;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
 }
 
 .join-button.joined {
   background: linear-gradient(135deg, var(--success-color), #4CAF50);
+  box-shadow: 0 0 15px var(--success-color);
 }
 
 /* Welcome Message */
 .welcome-message {
-  background-color: rgba(142, 68, 173, 0.05);
+  background-color: rgba(0, 230, 255, 0.08); /* Lighter neon background */
   padding: 1rem 1.5rem;
   border-radius: var(--border-radius-md);
   text-align: center;
   margin-bottom: 2rem;
-  border-left: 4px solid var(--primary-color);
+  border: 2px solid rgba(0, 230, 255, 0.3); /* Neon border */
   animation: fadeInUp 0.5s ease;
+  color: var(--primary-color);
+  text-shadow: var(--neon-blue-glow);
 }
 
 /* Footer */
 footer {
-  background-color: var(--white);
+  background-color: #050515; /* Even darker footer */
   padding: 2rem;
   text-align: center;
   margin-top: auto;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 230, 255, 0.1); /* Subtle neon line */
 }
 
 footer p {
   color: var(--text-color-light);
   margin: 0;
   font-size: 0.9rem;
+  text-shadow: 0 0 5px rgba(0, 230, 255, 0.1);
 }
 
-/* Animations */
+/* New Animations */
+@keyframes neonGlowPulse {
+  0% { text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--primary-color); }
+  50% { text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--secondary-color), 0 0 60px var(--primary-color); }
+  100% { text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--primary-color); }
+}
+
+@keyframes pulseButton {
+  0% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7); }
+  50% { box-shadow: 0 0 25px rgba(255, 0, 255, 0.9), 0 0 50px rgba(0, 230, 255, 0.9); }
+  100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7); }
+}
+
+@keyframes floatPaddle {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+/* Existing Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -622,57 +817,116 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0 1rem;
-  }
-  
-  .navbar-links {
-    gap: 1rem;
-  }
-  
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    letter-spacing: 0.05em; /* Adjusted for smaller screens */
   }
-  
+
   .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Adjusted for smaller screens */
+    letter-spacing: 0.05em;
   }
-  
+
+  .hero-description {
+    font-size: 1rem; /* Adjusted for smaller screens */
+    letter-spacing: 0.03em;
+  }
+
+  .ping-pong-paddle {
+    width: 250px;
+    top: 10%;
+    right: 0;
+  }
+
   .content-section {
     padding: 3rem 1rem;
   }
-  
-  .card-container, .tournament-list {
+
+  .about-project-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-project-image-frame {
+    order: -1; /* Move image above text on small screens */
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .features-grid {
     grid-template-columns: 1fr;
   }
-  
-  .button-group {
-    flex-direction: column;
+
+  .team-grid {
+    justify-content: flex-start; /* Allow scrolling on smaller screens */
   }
-  
-  .form-container {
-    padding: 1.5rem;
+
+  /* Responsive for Navbar */
+  .navbar {
+    padding: 0 1rem; /* Smaller padding on mobile */
+  }
+
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+
+  .navbar-links {
+    gap: 0.8rem; /* Smaller gap for links */
+  }
+
+  .page {
+    margin-top: 60px; /* Adjust if navbar height changes on mobile */
   }
 }
 
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
-  
-  .navbar-logo {
-    font-size: 1.2rem;
+
+  .play-now-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
   }
-  
-  .navbar-link {
-    font-size: 0.9rem;
+
+  .ping-pong-paddle {
+    width: 200px;
+    top: 15%;
+    right: -20px; /* Adjust if it's off-screen */
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .feature-button {
+    font-size: 1rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .team-member-avatar {
+    width: 80px;
+    height: 80px;
   }
 }
 
 .back-button {
-  margin-top: 2rem;
+  margin-top: 3rem;
   display: block;
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Ensure primary and secondary buttons within the form container stack and take full width */
+.form-container .primary-button,
+.form-container .secondary-button {
+  width: 100%;     /* Make button full width */
+  display: block;  /* Ensure it takes its own line */
+  box-sizing: border-box; /* Ensures padding/border are included in the width */
 }
