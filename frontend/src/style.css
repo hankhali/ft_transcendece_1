@@ -3,28 +3,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Adjusted for Dark Theme & Neon Glow */
-  --primary-color: #00E6FF; /* Neon Blue */
-  --secondary-color: #FF00FF; /* Neon Pink/Magenta */
-  --accent-color: #FF6B6B; /* Retaining for general accents if needed */
-  --accent-color-2: #FFC3A0; /* Retaining */
-
-  --background-color: #080820; /* Very dark blue/purple */
-  --text-color: #E0E0FF; /* Light, slightly blue-ish text */
-  --text-color-light: #AAAAFF; /* Lighter text for subtitles */
-  --white: #FFFFFF; /* Pure white, used sparingly */
+  --primary-color: #00E6FF;
+  --secondary-color: #FF00FF;
+  --accent-color: #FF6B6B;
+  --accent-color-2: #FFC3A0;
+  --background-color: #080820;
+  --text-color: #E0E0FF;
+  --text-color-light: #AAAAFF; 
+  --white: #FFFFFF; 
   --error-color: #FF6B6B;
   --success-color: #66BB6A;
-
-  /* Neon Glow Effect */
   --neon-blue-glow: 0 0 10px #00E6FF, 0 0 20px #00E6FF, 0 0 30px #00E6FF, 0 0 40px #00E6FF;
   --neon-pink-glow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF, 0 0 40px #FF00FF;
   --neon-gradient-glow: 0 0 10px rgba(0, 230, 255, 0.7), 0 0 20px rgba(255, 0, 255, 0.7);
-
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); /* Less prominent in dark theme */
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adjusted for contrast */
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25); /* Adjusted for contrast */
-
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); 
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
   --border-radius-sm: 8px;
   --border-radius-md: 16px;
   --border-radius-lg: 24px;
@@ -34,6 +28,7 @@
   --transition-slow: 0.5s ease;
 }
 
+/* Universal box-sizing for consistent layout */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -47,18 +42,18 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevents horizontal scroll */
   background-image: radial-gradient(circle at 10% 20%, rgba(0, 230, 255, 0.05) 0%, transparent 40%),
                     radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 40%);
   background-attachment: fixed;
 }
 
-/* Typography */
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--primary-color); /* Default for headers, will override some */
+  color: var(--primary-color); /* Primary color for all headings */
 }
 
 h1 {
@@ -89,39 +84,39 @@ p {
 }
 
 .page {
-  flex: 1;
+  flex: 1; /* Allows page content to take available space */
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.5s ease-in-out;
   padding: 0;
-  margin-top: 70px; /* IMPORTANT: Ensures page content is below fixed navbar */
+  margin-top: 70px; /* Space for fixed navbar */
 }
 
-/* Navigation - Adjusted to be visible and centered */
+/* Navbar */
 .navbar {
-  position: fixed; /* Keep fixed to stay at top */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background-color: rgba(8, 8, 32, 0.8); /* Semi-transparent dark background */
-  backdrop-filter: blur(8px); /* Add blur for a modern look */
+  background-color: rgba(8, 8, 32, 0.8);
+  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
-  justify-content: center; /* CENTER NAV LINKS */
+  justify-content: center; /* Center content horizontally */
   align-items: center;
   padding: 0 2rem;
   z-index: 1000;
-  box-shadow: var(--shadow-md), 0 0 10px rgba(0, 230, 255, 0.1); /* Subtle glow on navbar */
+  box-shadow: var(--shadow-md), 0 0 10px rgba(0, 230, 255, 0.1);
   transition: all var(--transition-normal);
 }
 
 .navbar-logo {
-  display: none; /* HIDE THE LOGO COMPLETELY */
+  display: none; /* Hidden as per original */
 }
 
 .navbar-links {
-  display: flex; /* Make links visible */
+  display: flex;
   gap: 1.5rem;
 }
 
@@ -129,7 +124,7 @@ p {
   color: var(--text-color-light);
   text-decoration: none;
   font-weight: 500;
-  font-size: 1.1rem; /* Slightly larger for prominence */
+  font-size: 1.1rem;
   padding: 0.5rem 0;
   position: relative;
   transition: all var(--transition-fast);
@@ -159,17 +154,16 @@ p {
   border-radius: var(--border-radius-full);
 }
 
-
-/* Hero Section - This will be the main 'Neon Pong' section */
+/* Hero Section */
 .hero-section {
   min-height: calc(100vh - 70px); /* Takes full viewport height minus navbar */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Align content to the top */
+  justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 8rem 2rem 4rem; /* More padding at top */
-  background: transparent; /* Background handled by body */
+  padding: 0 2rem 2rem;
+  background: transparent;
   position: relative;
   overflow: hidden;
 }
@@ -181,7 +175,6 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  /* Subtle radial gradients from the screenshot */
   background: radial-gradient(circle at 20% 10%, rgba(0, 230, 255, 0.08), transparent 50%),
               radial-gradient(circle at 80% 90%, rgba(255, 0, 255, 0.08), transparent 50%);
   z-index: -1;
@@ -197,10 +190,11 @@ p {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  color: transparent; /* Makes the gradient visible */
   text-shadow: var(--neon-blue-glow);
   font-weight: 700;
 }
+
 .hero-subtitle {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.5rem;
@@ -213,7 +207,7 @@ p {
   text-shadow: 0 0 8px rgba(0, 230, 255, 0.5), 0 0 15px rgba(0, 230, 255, 0.3);
 }
 
-.hero-description { /* New style for the descriptive text under the subtitle */
+.hero-description {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.15rem;
   color: var(--text-color-light);
@@ -225,7 +219,6 @@ p {
   text-shadow: 0 0 5px rgba(255, 0, 255, 0.4), 0 0 10px rgba(255, 0, 255, 0.2);
 }
 
-
 .hero-cta {
   animation: fadeInUp 0.8s ease-out 0.4s both;
   display: flex;
@@ -236,24 +229,24 @@ p {
 }
 
 .play-now-button {
-  background: linear-gradient(90deg, #FF00FF 0%, #00E6FF 100%); /* Neon gradient */
+  background: linear-gradient(90deg, #FF00FF 0%, #00E6FF 100%);
   color: var(--white);
   padding: 1rem 3rem;
   font-size: 1.2rem;
   font-weight: 700;
   border-radius: var(--border-radius-full);
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7); /* Double glow */
-  animation: pulseButton 1.5s infinite alternate; /* Pulsing effect */
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7);
+  animation: pulseButton 1.5s infinite alternate;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   transition: all var(--transition-normal);
+  border: none; /* Ensure no default button border */
 }
 
 .play-now-button:hover {
   background: linear-gradient(90deg, #00E6FF 0%, #FF00FF 100%);
   box-shadow: 0 0 20px rgba(255, 0, 255, 0.9), 0 0 40px rgba(0, 230, 255, 0.9);
   transform: translateY(-3px) scale(1.02);
-  border-color: transparent; /* Set to transparent to ensure no visible border on hover */
 }
 
 .play-now-button:active {
@@ -261,12 +254,11 @@ p {
   box-shadow: var(--neon-gradient-glow);
 }
 
-/* Ping Pong Paddle Image */
 .ping-pong-paddle {
   position: absolute;
-  top: 5%; /* Adjust positioning based on screen size */
+  top: 5%;
   right: 5%;
-  width: 400px; /* Adjust size as needed */
+  width: 400px;
   height: auto;
   filter: drop-shadow(0 0 25px var(--primary-color)) drop-shadow(0 0 40px var(--secondary-color));
   animation: floatPaddle 3s ease-in-out infinite alternate;
@@ -274,20 +266,20 @@ p {
   opacity: 0.8;
 }
 
-/* Content Section */
+/* Content Sections */
 .content-section {
   padding: 4rem 2rem;
-  max-width: 1000px; /* Adjusted max-width */
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
 
 .section-title {
-  text-align: left; /* Aligned left as in screenshot */
+  text-align: left;
   margin-bottom: 2rem;
   position: relative;
-  font-size: 1.8rem; /* Slightly smaller for internal sections */
-  color: var(--white); /* White for main section titles */
+  font-size: 1.8rem;
+  color: var(--white);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-shadow: var(--neon-blue-glow);
@@ -296,17 +288,16 @@ p {
 .section-title::after {
   content: '';
   position: absolute;
-  bottom: -5px; /* Adjust position */
-  left: 0; /* Align to left */
-  transform: none; /* No translateX */
-  width: 80px; /* Wider line */
-  height: 2px; /* Thinner line */
+  bottom: -5px;
+  left: 0;
+  width: 80px;
+  height: 2px;
   background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
   border-radius: var(--border-radius-full);
   box-shadow: var(--neon-gradient-glow);
 }
 
-/* About Project Section Specifics (Removed from home page, but keeping styles if used elsewhere) */
+/* About Project Section (if used) */
 .about-project-content {
   display: flex;
   gap: 2rem;
@@ -325,7 +316,7 @@ p {
 }
 
 .about-project-icon {
-  font-size: 3rem; /* Example size for icon */
+  font-size: 3rem;
   color: var(--primary-color);
   margin-right: 1rem;
   vertical-align: middle;
@@ -336,7 +327,7 @@ p {
   flex: 1;
   min-width: 300px;
   max-width: 400px;
-  height: 200px; /* Fixed height for consistency */
+  height: 200px;
   background-color: rgba(0, 0, 0, 0.2);
   border: 2px solid;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
@@ -352,12 +343,11 @@ p {
 .about-project-image-frame img {
   width: 90%;
   height: 90%;
-  object-fit: contain; /* Ensure image fits */
-  filter: brightness(1.5) saturate(1.5); /* Enhance neon effect */
+  object-fit: contain;
+  filter: brightness(1.5) saturate(1.5);
 }
 
-
-/* Features Section (Removed from home page, but keeping styles if used elsewhere) */
+/* Features Section (if used) */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -365,8 +355,8 @@ p {
   margin: 2rem 0;
 }
 
-.feature-button { /* New class for the feature buttons */
-  background: rgba(0, 0, 0, 0.3); /* Transparent background for inner elements */
+.feature-button {
+  background: rgba(0, 0, 0, 0.3);
   color: var(--text-color);
   border: 2px solid;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
@@ -376,7 +366,7 @@ p {
   font-weight: 500;
   text-align: center;
   transition: all var(--transition-normal);
-  box-shadow: var(--neon-gradient-glow); /* Initial glow */
+  box-shadow: var(--neon-gradient-glow);
   cursor: pointer;
 }
 
@@ -388,36 +378,54 @@ p {
 
 /* Meet the Team Section */
 .team-grid {
-  display: flex; /* Using flexbox for horizontal scroll if many members */
-  overflow-x: auto; /* Enable horizontal scrolling */
-  gap: 2rem;
-  margin: 2rem 0;
-  padding-bottom: 1rem; /* Add padding for scrollbar */
-  justify-content: center; /* Center items if they don't overflow */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
 }
 
 .team-member-card {
-  flex-shrink: 0; /* Prevent shrinking */
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+    max-width: 180px;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-normal);
 }
 
 .team-member-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid;
-  border-image: linear-gradient(45deg, var(--secondary-color), var(--primary-color)) 1;
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 20px rgba(0, 230, 255, 0.7); /* Neon glow */
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid transparent;
+    box-shadow:
+        0 0 5px var(--secondary-color),
+        0 0 10px var(--primary-color),
+        0 0 15px var(--secondary-color),
+        0 0 20px var(--primary-color),
+        inset 0 0 5px var(--secondary-color),
+        inset 0 0 10px var(--primary-color);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    margin-bottom: 1rem;
 }
 
 .team-member-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(255, 0, 255, 0.9), 0 0 30px rgba(0, 230, 255, 0.9);
+    transform: scale(1.05);
+    box-shadow:
+        0 0 10px var(--secondary-color),
+        0 0 20px var(--primary-color),
+        0 0 30px var(--secondary-color),
+        0 0 40px var(--primary-color),
+        inset 0 0 10px var(--secondary-color),
+        inset 0 0 20px var(--primary-color);
 }
 
 .team-member-name {
@@ -428,50 +436,47 @@ p {
   text-shadow: 0 0 5px rgba(0, 230, 255, 0.3);
 }
 
-/* Tournament Types Section (New Section on Home Page) */
+/* Tournament Types Section */
 .tournament-types-section {
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers the whole carousel container */
+  align-items: center;
   width: 100%;
   box-sizing: border-box;
 }
 
 .tournament-carousel-container {
-    position: relative; /* Needed for absolute positioning of arrows */
-    width: 95%; /* Adjust width for desktop views */
-    max-width: 1200px; /* Max width for the carousel */
-    margin-top: 1.5rem; /* Space from title */
+    position: relative;
+    width: 95%;
+    max-width: 1200px;
+    margin-top: 1.5rem;
     display: flex;
-    align-items: center; /* Vertically align arrows with grid */
-    padding: 0 20px; /* Space for arrows */
+    align-items: center;
+    padding: 0 20px;
     box-sizing: border-box;
 }
 
 .tournament-types-grid {
-    display: flex; /* Changed to flex */
-    flex-wrap: nowrap; /* Prevent wrapping onto next line */
-    overflow-x: auto; /* Enable horizontal scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scroll-snap-type: x mandatory; /* Snap to beginning of items */
-    gap: 2rem; /* Space between cards */
-    padding-bottom: 1rem; /* Space for scrollbar if present */
-    width: 100%; /* Take full width of its parent (.tournament-carousel-container) */
-    /* Hide scrollbar visually but keep functionality */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 2rem;
+    padding-bottom: 1rem;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 .tournament-types-grid::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
 }
 
 .tournament-type-card {
-    flex: 0 0 auto; /* Prevent cards from growing or shrinking, keep their defined width */
-    width: 300px; /* Fixed width for each card, adjust as needed */
-    scroll-snap-align: start; /* Snap point at the start of each card */
-
-    /* Keep existing styles */
+    flex: 0 0 auto;
+    width: 300px;
+    scroll-snap-align: start;
     background: rgba(0, 0, 0, 0.3);
     color: var(--text-color);
     border: 2px solid;
@@ -514,8 +519,47 @@ p {
     margin-bottom: 0.5rem;
 }
 
+/* Carousel Navigation Arrows */
+.carousel-navigation {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    box-shadow: var(--neon-blue-glow);
+    transition: all var(--transition-fast);
+}
 
-/* Buttons - General adjustments for neon theme */
+.carousel-navigation:hover {
+    background: var(--primary-color);
+    color: var(--background-color);
+    box-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--secondary-color);
+}
+
+.carousel-navigation.left {
+    left: 0;
+}
+
+.carousel-navigation.right {
+    right: 0;
+}
+
+.carousel-navigation.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Buttons */
 button {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
@@ -535,7 +579,7 @@ button {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: var(--white);
   box-shadow: var(--neon-gradient-glow);
-  margin-bottom: 1.5rem; /* ADD THIS LINE: Creates space below the button */
+  margin-bottom: 1.5rem;
 }
 
 .primary-button:hover {
@@ -574,16 +618,16 @@ button:disabled {
   border: 1px solid #333;
 }
 
-/* Forms (Register Page) - Adapted for dark theme */
+/* Forms (Register Page) */
 .form-container {
   max-width: 500px;
   margin: 0 auto;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+  background-color: rgba(0, 0, 0, 0.4);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md), var(--neon-gradient-glow); /* Add glow */
+  box-shadow: var(--shadow-md), var(--neon-gradient-glow);
   padding: 2.5rem;
-  border: 1px solid rgba(0, 230, 255, 0.2); /* Subtle neon border */
+  border: 1px solid rgba(0, 230, 255, 0.2);
 }
 
 .form-title {
@@ -609,7 +653,7 @@ button:disabled {
   transition: all var(--transition-fast);
   background-color: rgba(0, 0, 0, 0.7);
   color: var(--text-color);
-  margin-bottom: 1.5rem; /* ADD THIS LINE: Space after the input field */
+  margin-bottom: 1.5rem;
 }
 
 .form-input:focus {
@@ -630,9 +674,17 @@ button:disabled {
   text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
 }
 
+/* Ensure primary and secondary buttons within the form container stack and take full width */
+.form-container .primary-button,
+.form-container .secondary-button {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
 /* Loading States */
 .loading-overlay {
-  background-color: rgba(8, 8, 32, 0.9); /* Darker overlay */
+  background-color: rgba(8, 8, 32, 0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -652,14 +704,17 @@ button:disabled {
 .message {
   padding: 1rem;
   border-radius: var(--border-radius-sm);
-  margin: 1rem auto; /* Center messages */
-  width: fit-content; /* Fit to content width */
+  margin: 1rem auto;
+  width: fit-content;
   animation: slideIn 0.3s ease;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-md); /* Add shadow */
+  box-shadow: var(--shadow-md);
+  font-weight: bold; /* Added for consistency */
+  text-align: center; /* Added for consistency */
+  transition: opacity 0.5s ease-out; /* Added for consistency */
 }
 
 .error-message {
@@ -676,7 +731,7 @@ button:disabled {
   text-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
 }
 
-/* Tournament List - Using generic card styles */
+/* Tournament List */
 .tournament-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -685,49 +740,73 @@ button:disabled {
 }
 
 .tournament-item {
-  background-color: rgba(0, 0, 0, 0.3); /* Darker background */
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-md);
-  padding: 1.5rem;
+  /* Adjusted padding for more horizontal space */
+  padding: 1.5rem 2rem; /* Added 2rem for left/right padding */
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Ensure content stacks vertically */
   position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(0, 230, 255, 0.1); /* Subtle neon border */
+  overflow: hidden; /* Keep this for card effects */
+  border: 1px solid rgba(0, 230, 255, 0.1);
 }
 
 .tournament-item:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-lg), var(--neon-gradient-glow); /* Add glow on hover */
+  box-shadow: var(--shadow-lg), var(--neon-gradient-glow);
 }
 
 .tournament-item h3 {
   color: var(--primary-color);
   text-shadow: 0 0 8px rgba(0, 230, 255, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+/* Status indicator and text - minor adjustments */
+.tournament-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-color-light);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    /* Ensure text flows naturally and doesn't get cut off */
+    white-space: normal; 
 }
 
 .status-indicator {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background-color: #95a5a6;
-  box-shadow: 0 0 5px #95a5a6; /* Add glow to status */
+  box-shadow: 0 0 6px #95a5a6;
+  flex-shrink: 0;
 }
 
 .status-open {
   background-color: var(--success-color);
-  box-shadow: 0 0 10px rgba(102, 187, 106, 0.8);
+  box-shadow: 0 0 10px rgba(102, 187, 106, 1);
+  color: var(--success-color);
+  text-shadow: 0 0 4px rgba(102, 187, 106, 0.9), 0 0 8px rgba(102, 187, 106, 0.6);
 }
 
 .status-in-progress {
   background-color: #f39c12;
-  box-shadow: 0 0 10px rgba(243, 156, 18, 0.8);
+  box-shadow: 0 0 10px rgba(243, 156, 18, 1);
+  color: #f39c12;
+  text-shadow: 0 0 4px rgba(243, 156, 18, 0.9), 0 0 8px rgba(243, 156, 18, 0.6);
 }
 
 .status-completed {
   background-color: var(--secondary-color);
-  box-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 1);
+  color: var(--secondary-color);
+  text-shadow: 0 0 4px rgba(255, 0, 255, 0.9), 0 0 8px rgba(255, 0, 255, 0.6);
 }
 
 .join-button.joined {
@@ -737,12 +816,12 @@ button:disabled {
 
 /* Welcome Message */
 .welcome-message {
-  background-color: rgba(0, 230, 255, 0.08); /* Lighter neon background */
+  background-color: rgba(0, 230, 255, 0.08);
   padding: 1rem 1.5rem;
   border-radius: var(--border-radius-md);
   text-align: center;
   margin-bottom: 2rem;
-  border: 2px solid rgba(0, 230, 255, 0.3); /* Neon border */
+  border: 2px solid rgba(0, 230, 255, 0.3);
   animation: fadeInUp 0.5s ease;
   color: var(--primary-color);
   text-shadow: var(--neon-blue-glow);
@@ -750,11 +829,11 @@ button:disabled {
 
 /* Footer */
 footer {
-  background-color: #050515; /* Even darker footer */
+  background-color: #050515;
   padding: 2rem;
   text-align: center;
-  margin-top: auto;
-  border-top: 1px solid rgba(0, 230, 255, 0.1); /* Subtle neon line */
+  margin-top: 3rem;
+  border-top: 1px solid rgba(0, 230, 255, 0.1);
 }
 
 footer p {
@@ -764,7 +843,7 @@ footer p {
   text-shadow: 0 0 5px rgba(0, 230, 255, 0.1);
 }
 
-/* New Animations */
+/* Animations */
 @keyframes neonGlowPulse {
   0% { text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--primary-color); }
   50% { text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--secondary-color), 0 0 60px var(--primary-color); }
@@ -783,7 +862,6 @@ footer p {
   100% { transform: translateY(0); }
 }
 
-/* Existing Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -815,20 +893,25 @@ footer p {
   to { transform: rotate(360deg); }
 }
 
+@keyframes pulse {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.05); opacity: 0.9; }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 3rem;
-    letter-spacing: 0.05em; /* Adjusted for smaller screens */
+    letter-spacing: 0.05em;
   }
 
   .hero-subtitle {
-    font-size: 1.2rem; /* Adjusted for smaller screens */
+    font-size: 1.2rem;
     letter-spacing: 0.05em;
   }
 
   .hero-description {
-    font-size: 1rem; /* Adjusted for smaller screens */
+    font-size: 1rem;
     letter-spacing: 0.03em;
   }
 
@@ -848,7 +931,7 @@ footer p {
   }
 
   .about-project-image-frame {
-    order: -1; /* Move image above text on small screens */
+    order: -1;
     margin-bottom: 1.5rem;
     width: 100%;
     max-width: 350px;
@@ -859,12 +942,11 @@ footer p {
   }
 
   .team-grid {
-    justify-content: flex-start; /* Allow scrolling on smaller screens */
+    justify-content: center;
   }
 
-  /* Responsive for Navbar */
   .navbar {
-    padding: 0 1rem; /* Smaller padding on mobile */
+    padding: 0 1rem;
   }
 
   .navbar-logo {
@@ -872,11 +954,27 @@ footer p {
   }
 
   .navbar-links {
-    gap: 0.8rem; /* Smaller gap for links */
+    gap: 0.8rem;
   }
 
   .page {
-    margin-top: 60px; /* Adjust if navbar height changes on mobile */
+    margin-top: 60px;
+  }
+
+  /* Responsive adjustments for carousel */
+  .tournament-carousel-container {
+      width: 100%;
+      padding: 0 30px;
+  }
+
+  .tournament-type-card {
+      width: 250px;
+  }
+
+  .carousel-navigation {
+      width: 35px;
+      height: 35px;
+      font-size: 1.2rem;
   }
 }
 
@@ -893,7 +991,7 @@ footer p {
   .ping-pong-paddle {
     width: 200px;
     top: 15%;
-    right: -20px; /* Adjust if it's off-screen */
+    right: -20px;
   }
 
   .section-title {
@@ -909,8 +1007,17 @@ footer p {
     width: 80px;
     height: 80px;
   }
+
+  .tournament-carousel-container {
+      padding: 0 20px;
+  }
+  .tournament-type-card {
+      width: 90%;
+      max-width: 280px;
+  }
 }
 
+/* Utility Classes */
 .back-button {
   margin-top: 3rem;
   display: block;
@@ -923,10 +1030,47 @@ footer p {
     display: none;
 }
 
-/* Ensure primary and secondary buttons within the form container stack and take full width */
-.form-container .primary-button,
-.form-container .secondary-button {
-  width: 100%;     /* Make button full width */
-  display: block;  /* Ensure it takes its own line */
-  box-sizing: border-box; /* Ensures padding/border are included in the width */
+.hidden-visually {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+}
+
+/* Voice Control Button */
+.voice-control-button {
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: var(--background-color); /* Use background-color for dark text on bright primary */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-left: 1rem;
+}
+
+.voice-control-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.voice-control-button.active-voice {
+    background-color: var(--success-color);
+    animation: pulse 1s infinite alternate;
+}
+
+.voice-control-button:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Message Hidden State */
+.message.hidden {
+    opacity: 0;
 }
