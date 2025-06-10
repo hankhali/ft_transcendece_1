@@ -32,7 +32,8 @@ This is 25% of the manadotary part
 ✅ Uses pure PHP, no classes, which is valid for small APIs like this.
 ✅ Compatible with curl or Postman.
 
-* To Run:
+To Run:
+
 #1
 - Start Apache via XAMPP
 - Place this project in htdocs/
