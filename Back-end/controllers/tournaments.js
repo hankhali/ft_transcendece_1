@@ -97,7 +97,29 @@ async function getTournamentDetails(tournamentId){
     return { checkTournament, displayPlayers };
 }
 
+async function leaveTournament(tournamentId, playerId){
+    //check if tournament exist
+    const checkTournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
+    if(!checkTournament){
+        throw new Error('Tournament not found');
+    }
 
+    //before leaving, you should check if the player who wants to leave is in the tournament or not
+    const isPlayerExists = db.prepare('SELECT * FROM tournament_players WHERE tournament_id = ? AND player_id = ?').get(tournamentId, playerId);
+    if(!isPlayerExists){
+        throw new Error('Player not found in this tournament');
+    }
+
+    //players cant leave tournament if it already started (i will leave it for now)
+    if (checkTournament.status === 'started') {
+        throw new Error('Cannot leave a tournament that has already started');
+    }
+
+    //decide whether you want to delete the player and their history permanently or what (soft deletion for now)
+    //mark player as left
+    db.prepare(`UPDATE tournament_players SET status = 'left' WHERE tournament_id = ? AND player_id = ?`).run(tournamentId, playerId);
+    return { message: `Player ${playerId} has left Tournament ${tournamentId}` };
+}
 
 
 
@@ -106,5 +128,6 @@ async function getTournamentDetails(tournamentId){
 module.exports = {
     createTournament,
     joinTournament,
-    getTournamentDetails
+    getTournamentDetails,
+    leaveTournament
 };
