@@ -5,6 +5,8 @@ const db = require('../queries/database');
 const { createTournament} = require('../controllers/tournaments');
 const { joinTournament } = require('../controllers/tournaments');
 const { getTournamentDetails } = require('../controllers/tournaments');
+const { leaveTournament } = require('../controllers/tournaments');
+
 
 async function tournamentRoutes(fastify, options){
     //create a tournament
@@ -77,16 +79,27 @@ async function tournamentRoutes(fastify, options){
     });
 
 
+    
     //leave a tournament
-    // fastify.delete('/tournaments/:id/leave', async (request, reply) => {
-    //     try{
+    fastify.delete('/tournaments/:id/leave', async (request, reply) => {
+        try{
+            //get tournament id
+            //get the user from jwt who wants to leave
+            const tournamentId = Number(request.params.id);
+            const { player_id } = request.body;
 
-    //     }
-    //     catch(error){
-
-    //     }
-    // });
+            const leaveTrnmt = await leaveTournament(tournamentId, player_id);
+            if(!leaveTrnmt){
+                return reply.code(404).send({error});
+            }
+            return reply.code(200).send(leaveTrnmt);
+        }
+        catch(error){
+            return reply.code(404).send({ error: error.message });
+        }
+    }); 
     
 }
+
 
 module.exports = tournamentRoutes;
