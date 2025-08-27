@@ -9,6 +9,8 @@ const { userLogIn } = require('../controllers/users');
 const { deleteUserById } = require('../controllers/users');
 const { getUserdata } = require('../controllers/users');
 const { getPublicProfile } = require('../controllers/users');
+const { updateUserProfile } = require('../controllers/users');
+
 const db = require('../queries/database');
 
 
@@ -125,6 +127,23 @@ async function userRoutes(fastify, options){
             return reply.code(400).send({error: error.message});
         }
     });
+
+    //update user profile (username, nickname, password, avatar)
+    fastify.patch('/me', async (request, reply) => {
+        try{
+            const {userId, username, alias, password, oldPassword} = request.body;
+            if(!userId){
+                return reply.code(400).send({ error:'user id is required'});
+            }
+            const updates = { username, alias, password, oldPassword };
+            const updateProfile = await updateUserProfile(userId, updates);
+            return reply.code(200).send(updateProfile);
+        }
+        catch(error){
+            return reply.code(400).send({error: error.message});
+        }
+    });
 }
+
 
 module.exports = userRoutes;
