@@ -178,11 +178,71 @@ Handle uploads securely.
 //     }
 // }
 
+
+
+//update user information (nickname/username/password/avatar) using one function
+async function updateUserProfile(userId, updates){
+    //fetch user
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    if(!user){
+        throw new Error('Error fetching user');
+    }
+
+    const MAX_USERNAME_LENGTH = 15;
+    const MAX_NAME_LENGTH = 10;
+    const MIN_PASSWORD_LENGTH = 6;
+    //check if what you are updating is a username or a nickname or a password
+    //1.username
+    if(updates.username){
+        //unique username (not already used/exists)
+        const usernameExists = db.prepare('SELECT 1 FROM users WHERE username = ?').get(updates.username);
+        if(usernameExists){
+            throw new Error('Username already taken, choose another one');
+        }
+        if(updates.username.length > MAX_USERNAME_LENGTH){
+            throw new Error(`Username cannot exceed ${MAX_USERNAME_LENGTH} characters`);
+        }
+        db.prepare('UPDATE users SET username = ? WHERE id = ?').run(updates.username, userId);
+    }
+
+    //2. alias/nickname > check duplicates or nickname is the same
+    if(updates.alias){
+        const aliasExists = db.prepare('SELECT 1 FROM users WHERE alias = ?').get(updates.alias);
+        if(aliasExists){
+            throw new Error('alias already taken, choose another one');
+        }
+        if(updates.alias.length > MAX_NAME_LENGTH){
+            throw new Error(`alias cannot exceed ${MAX_NAME_LENGTH} characters`);
+        }
+        db.prepare('UPDATE users SET alias = ? WHERE id = ?').run(updates.alias, userId);
+    }
+
+    //3.password 
+    if(updates.password){
+        //ask for old password (in fronted (old password/new password/confirm new password))
+        if(!updates.oldPassword){
+            throw new Error('old password is required');
+        }
+        const validPassword = await bcrypt.compare(updates.oldPassword, user.password);
+        if(!validPassword){
+            throw new Error('old password is incorrect!');
+        }
+        const hashedPassword = await bcrypt.hash(updates.password, 10);
+        db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, userId);
+    }
+    //when you call this function in the api routes, it gives you choices on what do you want to update
+    //user press the update option of the thing they want to update
+    return { message: 'Profile updated successfully!'};
+    
+}
+
 module.exports = {
     createUser,
     userLogIn,
     deleteUserById,
     getUserdata,
-    getPublicProfile
+    getPublicProfile,
+    updateUserProfile
     // uploadAvatar
+
 };
