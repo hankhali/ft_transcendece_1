@@ -1,8 +1,10 @@
 import "./style.css"; // Ensure your CSS is imported
 import { createNeonPongGame } from "./game.ts";
+import { apiService } from "./api.ts";
 
 // Global variables for message display and voice control
 let messageTimeout: ReturnType<typeof setTimeout> | undefined;
+let currentUser: { id: number; username: string } | null = null;
 
 // Speech Recognition API setup
 interface CustomSpeechRecognition extends SpeechRecognition {
@@ -43,6 +45,8 @@ function getPageTitle(path: string): string {
       return "Tournaments - Neon Pong";
     case "/register":
       return "Register - Neon Pong";
+    case "/login":
+      return "Login - Neon Pong";
     default:
       return "Page Not Found - Neon Pong";
   }
@@ -188,9 +192,20 @@ function createNavbar(): HTMLElement {
     navigateTo("/register");
   });
 
+  const loginLink = document.createElement("a");
+    loginLink.className = "navbar-link";
+    loginLink.textContent = "Login";
+    loginLink.href = "/login";
+    loginLink.setAttribute("role", "menuitem");
+    loginLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigateTo("/login");
+    });
+
   navLinks.appendChild(homeLink);
   navLinks.appendChild(tournamentLink);
   navLinks.appendChild(registerLink);
+  navLinks.appendChild(loginLink);
 
   navbarLinksContainer.appendChild(navLinks);
 
@@ -422,6 +437,7 @@ function renderHomePage(): HTMLElement {
   tournamentList.className = "tournament-list";
   tournamentList.setAttribute("role", "list");
 
+  // commented out 
   const currentTournaments = [
     //{ name: 'Neon Cup #1', status: 'Open', starts: 'June 10, 2025', prize: '$1000' },
     //{ name: 'Cybernetic Showdown', status: 'In Progress', ends: 'June 15, 2025', prize: '$500' },
@@ -579,136 +595,108 @@ function renderHomePage(): HTMLElement {
 }
 
 // Tournament Page (Simplified for dynamic content, actual tournament data will be in renderHomePage)
+// Tournament Page (Updated with API integration)
 function renderTournamentPage(): HTMLElement {
   const tournamentPage = document.createElement("div");
   tournamentPage.className = "page content-section";
-  tournamentPage.id = "tournaments-page"; // Add ID for nav link highlighting
+  tournamentPage.id = "tournaments-page";
   tournamentPage.setAttribute("role", "main");
 
   const title = document.createElement("h1");
   title.className = "section-title";
-  title.textContent = "Browse All Tournaments";
+  title.textContent = "Tournaments";
   tournamentPage.appendChild(title);
 
-  const infoParagraph = document.createElement("p");
-  infoParagraph.style.textAlign = "center";
-  infoParagraph.style.color = "var(--text-color-light)";
-  // infoParagraph.innerHTML = 'Here you can find a comprehensive list of all past, ongoing, and upcoming tournaments. Use the filters and search options below to find your perfect match!';
-  tournamentPage.appendChild(infoParagraph);
-
-  // Example: Add some placeholder for filtering/search if desired
-  const filterSection = document.createElement("div");
-  filterSection.style.marginTop = "2rem";
-  filterSection.style.textAlign = "center";
-  filterSection.innerHTML = `
-    <input type="text" class="form-input" placeholder="Search tournaments..." style="width: 80%; max-width: 400px; margin-bottom: 1rem;">
-    <select class="form-input" style="width: 80%; max-width: 200px; margin-left: 1rem;">
-        <option value="">All Statuses</option>
-        <option value="open">Open</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
-    </select>
-  `;
-  tournamentPage.appendChild(filterSection);
+  // Create Tournament Button
+  const createButton = document.createElement("button");
+  createButton.className = "primary-button";
+  createButton.style.cssText =
+    "margin-bottom: 2rem; display: block; margin-left: auto; margin-right: auto;";
+  createButton.innerHTML = '<i class="fas fa-plus"></i> Create Tournament';
+  createButton.addEventListener("click", showCreateTournamentModal);
+  tournamentPage.appendChild(createButton);
 
   const tournamentList = document.createElement("div");
   tournamentList.className = "tournament-list";
   tournamentList.setAttribute("role", "list");
-
-  // Example tournament items (can be fetched from API later)
-  const tournaments = [
-    {
-      name: "Grand Masters Open 2025",
-      status: "Open",
-      starts: "Aug 1, 2025",
-      prize: "$5000",
-    },
-    {
-      name: "Spring Clash",
-      status: "Open",
-      starts: "July 20, 2025",
-      prize: "$750",
-    },
-    {
-      name: "Summer Showdown",
-      status: "In Progress",
-      ends: "July 5, 2025",
-      prize: "$1200",
-    },
-    {
-      name: "Winter Freeze Out",
-      status: "Completed",
-      date: "Jan 15, 2025",
-      winner: "ProPlayerZ",
-    },
-    {
-      name: "Autumn Annihilation",
-      status: "Completed",
-      date: "Nov 10, 2024",
-      winner: "LegendaryX",
-    },
-  ];
-
-  tournaments.forEach((t) => {
-    const item = document.createElement("div");
-    item.className = "tournament-item";
-    item.setAttribute("role", "listitem");
-
-    let statusClass = "";
-    let buttonText = "";
-    let buttonDisabled = false;
-    let detailsText = "";
-
-    if (t.status === "Open") {
-      statusClass = "status-open";
-      buttonText = "Join Tournament";
-      detailsText = `<strong>Starts:</strong> ${t.starts}<br><strong>Prize Pool:</strong> ${t.prize}`;
-    } else if (t.status === "In Progress") {
-      statusClass = "status-in-progress";
-      buttonText = "View Progress";
-      buttonDisabled = true;
-      detailsText = `<strong>Ends:</strong> ${t.ends}<br><strong>Prize Pool:</strong> ${t.prize}`;
-    } else {
-      // Completed
-      statusClass = "status-completed";
-      buttonText = "View Results";
-      detailsText = `<strong>Date:</strong> ${t.date}<br><strong>Winner:</strong> ${t.winner}`;
-    }
-
-    item.innerHTML = `
-      <h3>${t.name}</h3>
-      <p class="tournament-status"><span class="status-indicator ${statusClass}"></span> ${
-      t.status
-    }</p>
-      <p>${detailsText}</p>
-      <button class="primary-button join-button ${
-        t.status === "Completed" ? "secondary-button" : ""
-      }" ${buttonDisabled ? "disabled" : ""}>${buttonText}</button>
-    `;
-
-    const joinButton = item.querySelector(".join-button") as HTMLButtonElement;
-    if (joinButton) {
-      joinButton.setAttribute("aria-disabled", String(buttonDisabled));
-      joinButton.addEventListener("click", () => {
-        if (t.status === "Open") {
-          showMessage(`You joined the ${t.name}!`, "success");
-          joinButton.textContent = "Joined";
-          joinButton.disabled = true;
-          joinButton.setAttribute("aria-disabled", "true");
-          joinButton.classList.add("joined");
-          joinButton.classList.remove("primary-button");
-          joinButton.classList.add("secondary-button"); // Visually indicate it's joined
-        } else {
-          showMessage(`Viewing details for ${t.name}`, "info");
-        }
-      });
-    }
-    tournamentList.appendChild(item);
-  });
-
+  tournamentList.id = "tournament-list-container";
   tournamentPage.appendChild(tournamentList);
+
+  // Load tournaments from API
+  loadTournaments(tournamentList);
+
   tournamentPage.appendChild(createFooter());
   return tournamentPage;
+}
+
+//load tournaments from db
+async function loadTournaments(container: HTMLElement) {
+  showLoading();
+  try {
+    const result = await apiService.tournaments.getAll();
+
+    if (result.data && result.data.length > 0) {
+      container.innerHTML = "";
+      result.data.forEach((tournament: any) => {
+        const item = document.createElement("div");
+        item.className = "tournament-item";
+        item.setAttribute("role", "listitem");
+
+        let statusClass = "";
+        let buttonText = "";
+        let buttonDisabled = false;
+
+        if (tournament.status === "pending") {
+          statusClass = "status-open";
+          buttonText = "Join Tournament";
+        } else if (tournament.status === "started") {
+          statusClass = "status-in-progress";
+          buttonText = "View Progress";
+          buttonDisabled = true;
+        } else {
+          statusClass = "status-completed";
+          buttonText = "View Results";
+        }
+
+        item.innerHTML = `
+          <h3>${tournament.name}</h3>
+          <p class="tournament-status"><span class="status-indicator ${statusClass}"></span> ${
+          tournament.status
+        }</p>
+          <p><strong>Max Players:</strong> ${tournament.max_players}</p>
+          <button class="primary-button join-button ${
+            tournament.status === "completed" ? "secondary-button" : ""
+          }" ${buttonDisabled ? "disabled" : ""}>${buttonText}</button>
+        `;
+
+        const joinButton = item.querySelector(
+          ".join-button"
+        ) as HTMLButtonElement;
+        if (joinButton && tournament.status === "pending") {
+          joinButton.addEventListener("click", () => {
+            showJoinTournamentModal(tournament);
+          });
+        }
+
+        container.appendChild(item);
+      });
+    } else {
+      container.innerHTML = `
+        <div style="text-align: center; color: var(--text-color-light); padding: 2rem;">
+          <p>No tournaments available. Create one to get started!</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--error-color); padding: 2rem;">
+        <p>Failed to load tournaments. Please try again later.</p>
+      </div>
+    `;
+    console.error("Failed to load tournaments:", error);
+  } finally {
+    hideLoading();
+  }
 }
 
 // Register Page
@@ -835,8 +823,9 @@ function renderRegisterPage(): HTMLElement {
   backButton.addEventListener("click", () => navigateTo("/"));
   form.appendChild(backButton);
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Clear previous errors
     usernameError.textContent = "";
     emailError.textContent = "";
     passwordError.textContent = "";
@@ -850,6 +839,7 @@ function renderRegisterPage(): HTMLElement {
     let isValid = true;
     let firstInvalidField: HTMLElement | null = null;
 
+    // Validation logic (same as before)
     if (!usernameInput.value.trim()) {
       usernameError.textContent = "Username is required.";
       usernameInput.setAttribute("aria-invalid", "true");
@@ -883,19 +873,466 @@ function renderRegisterPage(): HTMLElement {
       return;
     }
 
+    //for registration
     showLoading();
-    setTimeout(() => {
+    try {
+      const result = await apiService.users.register(
+        usernameInput.value.trim(),
+        passwordInput.value,
+        emailInput.value.trim()
+      );
+
+      if (result.data) {
+        currentUser = {
+          id: result.data.userId,
+          username: usernameInput.value.trim(),
+        };
+        showMessage(
+          "Registration successful! Welcome to Neon Pong.",
+          "success"
+        );
+        form.reset();
+        navigateTo("/tournament");
+      } else {
+        showMessage(
+          result.error || "Registration failed. Please try again.",
+          "error"
+        );
+      }
+    } catch (error) {
+      showMessage("Registration failed. Please try again.", "error");
+      console.error("Registration error:", error);
+    } finally {
       hideLoading();
-      showMessage("Registration successful! Welcome to Neon Pong.", "success");
-      form.reset();
-      navigateTo("/");
-    }, 1500);
+    }
   });
 
   formContainer.appendChild(form);
   register.appendChild(formContainer);
   register.appendChild(createFooter());
   return register;
+}
+
+function renderLoginPage(): HTMLElement {
+  const login = document.createElement("div");
+  login.className = "page content-section";
+  login.id = "login";
+  login.setAttribute("role", "main");
+
+  const formContainer = document.createElement("div");
+  formContainer.className = "form-container";
+
+  const title = document.createElement("h2");
+  title.className = "form-title";
+  title.id = "login-form-title";
+  title.textContent = "Login to Neon Pong";
+  formContainer.appendChild(title);
+
+  const form = document.createElement("form");
+  form.setAttribute("aria-labelledby", "login-form-title");
+  form.noValidate = true;
+
+  // Username
+  const usernameLabel = document.createElement("label");
+  usernameLabel.className = "form-label";
+  usernameLabel.htmlFor = "login-username";
+  usernameLabel.textContent = "Username";
+  form.appendChild(usernameLabel);
+
+  const usernameInput = document.createElement("input");
+  usernameInput.type = "text";
+  usernameInput.id = "login-username";
+  usernameInput.className = "form-input";
+  usernameInput.placeholder = "Enter your username";
+  usernameInput.required = true;
+  usernameInput.setAttribute("aria-describedby", "login-username-error");
+  form.appendChild(usernameInput);
+  
+  const usernameError = document.createElement("span");
+  usernameError.id = "login-username-error";
+  usernameError.className = "form-error";
+  usernameError.setAttribute("aria-live", "polite");
+  usernameError.setAttribute("role", "alert");
+  form.appendChild(usernameError);
+
+  // Password
+  const passwordLabel = document.createElement("label");
+  passwordLabel.className = "form-label";
+  passwordLabel.htmlFor = "login-password";
+  passwordLabel.textContent = "Password";
+  form.appendChild(passwordLabel);
+
+  const passwordInput = document.createElement("input");
+  passwordInput.type = "password";
+  passwordInput.id = "login-password";
+  passwordInput.className = "form-input";
+  passwordInput.placeholder = "Enter your password";
+  passwordInput.required = true;
+  passwordInput.setAttribute("aria-describedby", "login-password-error");
+  form.appendChild(passwordInput);
+  
+  const passwordError = document.createElement("span");
+  passwordError.id = "login-password-error";
+  passwordError.className = "form-error";
+  passwordError.setAttribute("aria-live", "polite");
+  passwordError.setAttribute("role", "alert");
+  form.appendChild(passwordError);
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.className = "primary-button";
+  submitButton.textContent = "Login";
+  form.appendChild(submitButton);
+
+  const backButton = document.createElement("button");
+  backButton.type = "button";
+  backButton.className = "secondary-button back-button";
+  backButton.textContent = "Back to Home";
+  backButton.addEventListener("click", () => navigateTo("/"));
+  form.appendChild(backButton);
+
+  // Link to register page
+  const registerLinkContainer = document.createElement("div");
+  registerLinkContainer.style.textAlign = "center";
+  registerLinkContainer.style.marginTop = "1rem";
+  registerLinkContainer.innerHTML = `
+    <p style="color: var(--text-color-light);">
+      Don't have an account? 
+      <a href="/register" style="color: var(--primary-color); text-decoration: none;" id="register-link">Register here</a>
+    </p>
+  `;
+  
+  const registerLink = registerLinkContainer.querySelector("#register-link");
+  registerLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigateTo("/register");
+  });
+  
+  form.appendChild(registerLinkContainer);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    // Clear previous errors
+    usernameError.textContent = "";
+    passwordError.textContent = "";
+    usernameInput.removeAttribute("aria-invalid");
+    passwordInput.removeAttribute("aria-invalid");
+
+    let isValid = true;
+    let firstInvalidField: HTMLElement | null = null;
+
+    // Validation
+    if (!usernameInput.value.trim()) {
+      usernameError.textContent = "Username is required.";
+      usernameInput.setAttribute("aria-invalid", "true");
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = usernameInput;
+    }
+    
+    if (!passwordInput.value) {
+      passwordError.textContent = "Password is required.";
+      passwordInput.setAttribute("aria-invalid", "true");
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = passwordInput;
+    }
+
+    if (!isValid) {
+      showMessage("Please fill in all required fields.", "error");
+      if (firstInvalidField) {
+        firstInvalidField.focus();
+      }
+      return;
+    }
+
+    //for login
+    showLoading();
+    try {
+      const result = await apiService.users.login(
+        usernameInput.value.trim(),
+        passwordInput.value
+      );
+
+      if (result.data) {
+        currentUser = {
+          id: result.data.userId,
+          username: result.data.username
+        };
+        showMessage(`Welcome back, ${result.data.username}!`, "success");
+        form.reset();
+        navigateTo("/tournament");
+      } else {
+        showMessage(result.error || "Login failed. Please check your credentials.", "error");
+      }
+    } catch (error) {
+      showMessage("Login failed. Please try again.", "error");
+      console.error("Login error:", error);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  formContainer.appendChild(form);
+  login.appendChild(formContainer);
+  login.appendChild(createFooter());
+  return login;
+}
+
+// Create Tournament Modal
+function showCreateTournamentModal() {
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  `;
+
+  const modalContent = document.createElement("div");
+  modalContent.className = "modal-content";
+  modalContent.style.cssText = `
+    background: var(--bg-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 20px var(--primary-color);
+  `;
+
+  modalContent.innerHTML = `
+    <h2 style="color: var(--primary-color); margin-bottom: 1.5rem; text-align: center;">Create Tournament</h2>
+    <form id="create-tournament-form">
+      <label for="tournament-name" style="display: block; margin-bottom: 0.5rem; color: var(--text-color);">Tournament Name:</label>
+      <input type="text" id="tournament-name" required style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid var(--primary-color); border-radius: 5px; background: var(--bg-color); color: var(--text-color);">
+      
+      <label for="max-players" style="display: block; margin-bottom: 0.5rem; color: var(--text-color);">Max Players:</label>
+      <select id="max-players" required style="width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border: 1px solid var(--primary-color); border-radius: 5px; background: var(--bg-color); color: var(--text-color);">
+        <option value="">Select Players</option>
+        <option value="4">4 Players</option>
+        <option value="8">8 Players</option>
+      </select>
+      
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" id="cancel-tournament" class="secondary-button">Cancel</button>
+        <button type="submit" class="primary-button">Create Tournament</button>
+      </div>
+    </form>
+  `;
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  const form = modal.querySelector(
+    "#create-tournament-form"
+  ) as HTMLFormElement;
+  const cancelBtn = modal.querySelector(
+    "#cancel-tournament"
+  ) as HTMLButtonElement;
+
+  cancelBtn.addEventListener("click", () => {
+    document.body.removeChild(modal);
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      showMessage("Please register first to create a tournament.", "error");
+      document.body.removeChild(modal);
+      navigateTo("/register");
+      return;
+    }
+
+    const nameInput = modal.querySelector(
+      "#tournament-name"
+    ) as HTMLInputElement;
+    const playersSelect = modal.querySelector(
+      "#max-players"
+    ) as HTMLSelectElement;
+
+    const name = nameInput.value.trim();
+    const maxPlayers = parseInt(playersSelect.value) as 4 | 8;
+
+    if (!name || !maxPlayers) {
+      showMessage("Please fill in all fields.", "error");
+      return;
+    }
+
+    //will create tournament
+    showLoading();
+    try {
+      const result = await apiService.tournaments.create(
+        name,
+        maxPlayers,
+        currentUser.id
+      );
+
+      if (result.data) {
+        showMessage(`Tournament "${name}" created successfully!`, "success");
+        document.body.removeChild(modal);
+        // Refresh tournament page
+        if (window.location.pathname === "/tournament") {
+          const app = document.getElementById("app");
+          if (app) {
+            setupRoutes(app);
+          }
+        }
+      } else {
+        showMessage(result.error || "Failed to create tournament.", "error");
+      }
+    } catch (error) {
+      showMessage("Failed to create tournament. Please try again.", "error");
+      console.error("Tournament creation error:", error);
+    } finally {
+      hideLoading();
+    }
+  });
+}
+
+// Join Tournament Modal
+function showJoinTournamentModal(tournament: any) {
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  `;
+
+  const modalContent = document.createElement("div");
+  modalContent.className = "modal-content";
+  modalContent.style.cssText = `
+    background: var(--bg-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 20px var(--primary-color);
+    max-height: 80vh;
+    overflow-y: auto;
+  `;
+
+  const aliasInputs = [];
+  let inputsHTML = "";
+
+  for (let i = 1; i <= tournament.max_players; i++) {
+    inputsHTML += `
+      <label for="alias-${i}" style="display: block; margin-bottom: 0.5rem; color: var(--text-color);">Player ${i} Alias:</label>
+      <input type="text" id="alias-${i}" required maxlength="10" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid var(--primary-color); border-radius: 5px; background: var(--bg-color); color: var(--text-color);" placeholder="Enter unique alias">
+    `;
+  }
+
+  modalContent.innerHTML = `
+    <h2 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Join "${tournament.name}"</h2>
+    <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-color-light);">Enter ${tournament.max_players} unique player aliases:</p>
+    <form id="join-tournament-form">
+      ${inputsHTML}
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" id="cancel-join" class="secondary-button">Cancel</button>
+        <button type="submit" class="primary-button">Join Tournament</button>
+      </div>
+    </form>
+  `;
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  const form = modal.querySelector("#join-tournament-form") as HTMLFormElement;
+  const cancelBtn = modal.querySelector("#cancel-join") as HTMLButtonElement;
+
+  cancelBtn.addEventListener("click", () => {
+    document.body.removeChild(modal);
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      showMessage("Please register first to join a tournament.", "error");
+      document.body.removeChild(modal);
+      navigateTo("/register");
+      return;
+    }
+
+    const aliases = [];
+    for (let i = 1; i <= tournament.max_players; i++) {
+      const input = modal.querySelector(`#alias-${i}`) as HTMLInputElement;
+      const alias = input.value.trim();
+      if (!alias) {
+        showMessage(`Please enter alias for Player ${i}.`, "error");
+        input.focus();
+        return;
+      }
+      aliases.push(alias);
+    }
+
+    // Check for duplicate aliases
+    const uniqueAliases = new Set(aliases);
+    if (uniqueAliases.size !== aliases.length) {
+      showMessage("All aliases must be unique!", "error");
+      return;
+    }
+    
+    //join tournament using aliases
+    showLoading();
+    try {
+      const result = await apiService.tournaments.join(
+        tournament.id,
+        aliases,
+        currentUser.id
+      );
+
+      if (result.data) {
+        showMessage(
+          `Successfully joined "${tournament.name}" with ${aliases.length} players!`,
+          "success"
+        );
+        document.body.removeChild(modal);
+        // Refresh tournament page
+        if (window.location.pathname === "/tournament") {
+          const app = document.getElementById("app");
+          if (app) {
+            setupRoutes(app);
+          }
+        }
+      } else {
+        showMessage(result.error || "Failed to join tournament.", "error");
+      }
+    } catch (error) {
+      showMessage("Failed to join tournament. Please try again.", "error");
+      console.error("Tournament join error:", error);
+    } finally {
+      hideLoading();
+    }
+  });
 }
 
 // Voice Control Functions
@@ -1100,6 +1537,7 @@ function setupRoutes(app: HTMLElement) {
     "/": renderHomePage,
     "/tournament": renderTournamentPage,
     "/register": renderRegisterPage,
+    "/login": renderLoginPage,
   };
 
   const renderFunction = routes[path];
@@ -1183,7 +1621,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("popstate", () => {
   if (currentGameContainer) {
     hideNeonPongGame();
-    return; 
+    return;
   }
   const app = document.getElementById("app");
   if (app) {
@@ -1195,10 +1633,8 @@ window.addEventListener("popstate", () => {
 let currentGameContainer: HTMLElement | null = null;
 
 // Function to display the game
-function showNeonPongGame() 
-{
-  if (currentGameContainer) 
-    {
+function showNeonPongGame() {
+  if (currentGameContainer) {
     hideNeonPongGame(); // Removes existing screen first if there is some
   }
 
@@ -1211,10 +1647,8 @@ function showNeonPongGame()
 }
 
 // Function to hide the game
-function hideNeonPongGame() 
-{
-  if (currentGameContainer) 
-    {
+function hideNeonPongGame() {
+  if (currentGameContainer) {
     currentGameContainer.remove();
     currentGameContainer = null;
     // Restore scrolling
