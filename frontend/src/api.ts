@@ -1,33 +1,40 @@
-// API integration utilities
-// API integration utilities
-// This file prepares the project for future API integration
-export interface ApiResponse<T> { // what types we want
+export interface ApiResponse<T> {
   data: T | null;
   error: string | null;
   loading: boolean;
 }
+
 export interface Tournament {
   id: number;
   name: string;
-  players: number; // Current players joined
-  maxPlayers: number; // Max players allowed in the tournament
-  status: 'Open' | 'In Progress' | 'Completed';
+  max_players: number;
+  status: 'pending' | 'started' | 'completed';
+  created_by: number;
 }
+
 export interface User {
   id: number;
-  alias: string;
+  username: string;
+  email: string;
+  alias?: string;
 }
-// Base API URL - points to our PHP backend server
-const API_BASE_URL = 'http://localhost:8000';
-// Generic fetch wrapper with typing and error handling
+
+export interface JoinTournamentRequest {
+  playerAliases: string[];
+  userId: number;
+}
+
+// Base API URL - update this to match your backend
+const API_BASE_URL = 'http://localhost:5000'; 
+
+// Generic fetch wrapper
 export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
-
-    // Default headers
+    
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -39,7 +46,8 @@ export async function fetchApi<T>(
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -58,82 +66,92 @@ export async function fetchApi<T>(
     };
   }
 }
-// API service functions - connected to real backend endpoints
+
+// API services
 export const apiService = {
-  // User related endpoints
+  // User endpoints
   users: {
-    register: async (username: string, password: string): Promise<ApiResponse<any>> => {
-      // Real API call to the PHP backend
-      return fetchApi('/register.php', {
+    //User registration 
+    register: async (username: string, password: string, email: string): Promise<ApiResponse<{ userId: number }>> => {
+      return fetchApi('/register', {
+        method: 'POST',
+        body: JSON.stringify({ username, password, email })
+      });
+    },
+
+    //setting user alias 
+    setAlias: async (userId: number, alias: string): Promise<ApiResponse<{ message: string; alias: string }>> => {
+      return fetchApi('/set-alias', {
+        method: 'POST',
+        body: JSON.stringify({ userId, alias })
+      });
+    },
+
+    // Login
+    login: async (username: string, password: string): Promise<ApiResponse<{ userId: number; username: string }>> => {
+      return fetchApi('/login', {
         method: 'POST',
         body: JSON.stringify({ username, password })
       });
     },
 
-    getProfile: async (): Promise<ApiResponse<User>> => {
-      // This would need to be implemented in the backend
-      // For now, return mock data
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: { id: 1, alias: 'Player1' },
-            error: null,
-            loading: false
-          });
-        }, 600);
+    // Get user profile
+    getProfile: async (userId: number): Promise<ApiResponse<User>> => {
+      return fetchApi(`/users/${userId}`, {
+        method: 'GET'
       });
     }
   },
 
   // Tournament related endpoints
   tournaments: {
+    // 3. Create tournament (4 or 8 players only)
+    create: async (name: string, maxPlayers: 4 | 8, userId: number): Promise<ApiResponse<Tournament>> => {
+      return fetchApi('/tournaments', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          name, 
+          max_players: maxPlayers,
+          created_by: userId 
+        })
+      });
+    },
+
+    // Get all tournaments
     getAll: async (): Promise<ApiResponse<Tournament[]>> => {
-      // This would need to be implemented in the backend
-      // For now, return mock data
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: [
-              { id: 1, name: 'Weekly Challenge', players: 5, maxPlayers: 8, status: 'Open' }, // Updated mock data
-              { id: 2, name: 'Pro League', players: 12, maxPlayers: 16, status: 'In Progress' }, // Updated mock data
-              { id: 3, name: 'Beginner Friendly', players: 3, maxPlayers: 4, status: 'Open' }, // Updated mock data
-              { id: 4, name: 'Speed Ping', players: 8, maxPlayers: 8, status: 'Completed' } // Added a completed one
-            ],
-            error: null,
-            loading: false
-          });
-        }, 1000);
+      return fetchApi('/tournaments', {
+        method: 'GET'
       });
     },
 
-    resetTournament: async (): Promise<ApiResponse<any>> => {
-      // Real API call to the PHP backend
-      return fetchApi('/tournament.php', {
-        method: 'POST'
+    // Get specific tournament details
+    getById: async (tournamentId: number): Promise<ApiResponse<{ tournament: Tournament; players: any[] }>> => {
+      return fetchApi(`/tournaments/${tournamentId}`, {
+        method: 'GET'
       });
     },
 
-    join: async (tournamentId: number): Promise<ApiResponse<{ success: boolean }>> => {
-      // This would need to be implemented in the backend
-      // For now, return mock data
-      console.log(`Attempting to join tournament with ID: ${tournamentId}`); // Debugging
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const mockSuccess = Math.random() > 0.1; // 90% success rate for mock
-          if (mockSuccess) {
-            resolve({
-              data: { success: true },
-              error: null,
-              loading: false
-            });
-          } else {
-            resolve({
-              data: null,
-              error: 'Failed to join tournament (mock error).',
-              loading: false
-            });
-          }
-        }, 800);
+    // 4. Join tournament with multiple aliases (4/8)
+    join: async (tournamentId: number, playerAliases: string[], userId: number): Promise<ApiResponse<{
+      message: string;
+      tournament_id: number;
+      players: string[];
+      status: string;
+    }>> => {
+      return fetchApi(`/tournaments/${tournamentId}/join`, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          playerAliases, 
+          userId 
+        })
+      });
+    },
+
+    // Leave tournament
+    leave: async (tournamentId: number, playerId: number): Promise<ApiResponse<{ message: string }>> => {
+      return fetchApi(`/tournaments/${tournamentId}/leave`, {
+        method: 'DELETE',
+        body: JSON.stringify({ player_id: playerId })
       });
     }
   }
