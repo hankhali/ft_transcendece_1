@@ -13,51 +13,80 @@
 
 const db = require('../queries/database');
 const bcrypt = require('bcrypt');
-const multer = require('multer');
 
 //insert a new user into the database
-async function createUser(username, password, email, alias){
-
-    //validate username input
+async function createUser(username, password, email){
     const MAX_USERNAME_LENGTH = 15;
-    const MAX_NAME_LENGTH = 10;
     const MIN_PASSWORD_LENGTH = 6;
-    //regular expression: It checks for something like name@example.com but doesn’t allow spaces, multiple @, or missing dots.
     const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Validation
+    if(!username || !password || !email){
+        throw new Error('All fields are required');
+    }
 
     if(username.length > MAX_USERNAME_LENGTH){
         throw new Error(`Username cannot exceed ${MAX_USERNAME_LENGTH} characters`);
     }
-    if(alias.length > MAX_NAME_LENGTH){
-        throw new Error(`alias cannot exceed ${MAX_NAME_LENGTH} characters`);
-    }
-    //validate password input and password is not empty
+
     if(password.length < MIN_PASSWORD_LENGTH){
         throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
     }
 
-    if(email && !EMAIL_REGEX.test(email)){
+    if(!EMAIL_REGEX.test(email)){
         throw new Error('Invalid email format');
     }
 
-
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    const stmt = db.prepare(`INSERT INTO users (username, password, email, alias) VALUES (?, ?, ?, ?)`);
     try{
-        const sql = stmt.run(username, hashedPassword, email, alias);
-        console.log('User Created Successfully!');
-        console.log(sql); //debug
-        return { id: sql.lastInsertRowid }; //returns the ID of the newly created user from sqlite
+        const stmt = db.prepare(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`);
+        const result = stmt.run(username, hashedPassword, email);
+        console.log('User Created Successfully! ID:', result.lastInsertRowid);
+        return { id: result.lastInsertRowid };
     }
     catch(error){
-        console.error('SQL Error:', error); //debug
+        console.error('SQL Error:', error);
         if(error.code === 'SQLITE_CONSTRAINT_UNIQUE' || error.code === 'SQLITE_CONSTRAINT'){
             throw new Error('Username or email already exists');
         }
         throw error;
     }
-};
+}
+
+// this function will set the alias when someone joins the tournament
+async function setUserAlias(userId, alias){
+    const MAX_ALIAS_LENGTH = 10;
+    if(!alias || alias.trim().length === 0){
+        throw new Error('Alias is required');
+    }
+    
+    if(alias.length > MAX_ALIAS_LENGTH){
+        throw new Error(`Alias cannot exceed ${MAX_ALIAS_LENGTH} characters`);
+    }
+
+    //check if user exists in db
+    const userExists = db.prepare('select id from users where id = ?').get(userId);
+    if(!userExists){
+        throw new Error('User not found');
+    }
+    try
+    {
+        const stmt = db.prepare('update users set alias = ? where id = ?');
+        const result = stmt.run(alias, userId);    
+        if(result.changes === 0)
+            {
+            throw new Error('Failed to update alias');
+        }   
+        return { message: 'Alias updated successfully', alias: alias };
+    }
+    catch(error)
+    {
+        console.error('SQL Error:', error);
+        throw error;
+    }
+}
+
 
 async function userLogIn(username, password){
     //validate input
@@ -147,11 +176,6 @@ async function deleteUser(userId){
     return { message: "Account deleted successfully" };
 }
 
-
-
-
-
-
 /*
 Validate file types.
 Limit file sizes.
@@ -178,71 +202,13 @@ Handle uploads securely.
 //     }
 // }
 
-
-
-//update user information (nickname/username/password/avatar) using one function
-async function updateUserProfile(userId, updates){
-    //fetch user
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-    if(!user){
-        throw new Error('Error fetching user');
-    }
-
-    const MAX_USERNAME_LENGTH = 15;
-    const MAX_NAME_LENGTH = 10;
-    const MIN_PASSWORD_LENGTH = 6;
-    //check if what you are updating is a username or a nickname or a password
-    //1.username
-    if(updates.username){
-        //unique username (not already used/exists)
-        const usernameExists = db.prepare('SELECT 1 FROM users WHERE username = ?').get(updates.username);
-        if(usernameExists){
-            throw new Error('Username already taken, choose another one');
-        }
-        if(updates.username.length > MAX_USERNAME_LENGTH){
-            throw new Error(`Username cannot exceed ${MAX_USERNAME_LENGTH} characters`);
-        }
-        db.prepare('UPDATE users SET username = ? WHERE id = ?').run(updates.username, userId);
-    }
-
-    //2. alias/nickname > check duplicates or nickname is the same
-    if(updates.alias){
-        const aliasExists = db.prepare('SELECT 1 FROM users WHERE alias = ?').get(updates.alias);
-        if(aliasExists){
-            throw new Error('alias already taken, choose another one');
-        }
-        if(updates.alias.length > MAX_NAME_LENGTH){
-            throw new Error(`alias cannot exceed ${MAX_NAME_LENGTH} characters`);
-        }
-        db.prepare('UPDATE users SET alias = ? WHERE id = ?').run(updates.alias, userId);
-    }
-
-    //3.password 
-    if(updates.password){
-        //ask for old password (in fronted (old password/new password/confirm new password))
-        if(!updates.oldPassword){
-            throw new Error('old password is required');
-        }
-        const validPassword = await bcrypt.compare(updates.oldPassword, user.password);
-        if(!validPassword){
-            throw new Error('old password is incorrect!');
-        }
-        const hashedPassword = await bcrypt.hash(updates.password, 10);
-        db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, userId);
-    }
-    //when you call this function in the api routes, it gives you choices on what do you want to update
-    //user press the update option of the thing they want to update
-    return { message: 'Profile updated successfully!'};
-    
-}
-
 module.exports = {
     createUser,
+    setUserAlias,
     userLogIn,
     deleteUserById,
     getUserdata,
     getPublicProfile,
-    updateUserProfile
+    deleteUser,
     // uploadAvatar
-
 };
