@@ -121,6 +121,48 @@ async function leaveTournament(tournamentId, playerId){
     return { message: `Player ${playerId} has left Tournament ${tournamentId}` };
 }
 
+//start the tournament
+async function startTournament(tournamentId){
+
+    const tournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
+    if(!tournament){
+        throw new Error('Tournament not found');
+    }
+
+
+    //check min and max players
+    const checkPlayersCount = db.prepare(`SELECT COUNT(*) as total FROM tournament_players WHERE tournament_id = ? AND status = 'joined'`).get(tournamentId).total;
+    if(checkPlayersCount > tournament.max_players){
+        throw new Error(`Too many players, maximun is ${tournament.max_players}`);
+    }
+    if(checkPlayersCount < tournament.min_players){
+        throw new Error(`Not enough players, minimum is &{tournament.min_players}`);
+    }
+
+    //shuffle players for matchmaking
+    //shuffle = randomize the list. matchmaking = take that list and create pairs (or groups)
+    //if we dont shuffle, players will be matched in the order the joined
+    const players = db.prepare(`SELECT player_id, tournament_alias 
+        FROM tournament_players
+        WHERE tournament_id = ? AND status = 'joined'
+        ORDER BY RANDOM()`).all(tournamentId);
+
+    //matchmaking (pair players into matches)
+    const matchMaking = [];
+    for(let i = 0; i < players.length; i += 2){
+        matchMaking.push({
+            player1: players[i],
+            player2: players[i + 1]
+        });
+    }
+
+    //check/update the status of the tournament (from pending to start)
+    db.prepare(`UPDATE tournaments SET status = 'started' WHERE id = ?`).run(tournamentId);
+
+
+    //return matchmaking so the fronted can show the players and who plays with who
+    return{ message: `Tournament ${tournament.name} has started!`, matchMaking};
+}
 
 
 
@@ -129,5 +171,7 @@ module.exports = {
     createTournament,
     joinTournament,
     getTournamentDetails,
-    leaveTournament
+    leaveTournament,
+    startTournament
 };
+
