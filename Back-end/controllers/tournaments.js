@@ -13,10 +13,9 @@ a tournament is not just one game → it’s a set of games between multiple pla
 */
 const db = require('../queries/database');
 
-async function createTournament(name, created_by = null, min_players = 2, max_players = 8){
-    //name the tournament
+async function createTournament(name, created_by, max_players = 8){
     const MIN_NAME_LENGTH = 3;
-   
+    
     if(!name){
         throw new Error('Tournament name is required');
     }
@@ -26,56 +25,103 @@ async function createTournament(name, created_by = null, min_players = 2, max_pl
     if(!created_by){
         throw new Error('Creator ID is required');
     }
-    if(min_players > max_players){
-        throw new Error('Minimun players cannot exceed maximum players');
+    
+    // Only allow 4 or 8 players
+    if(max_players !== 4 && max_players !== 8){
+        throw new Error('Tournament can only have 4 or 8 maximum players');
     }
-
 
     try{
-        const stmt = db.prepare(`INSERT INTO tournaments (name, min_players, max_players, status, created_by)
-            VALUES (?, ?, ?, 'pending', ?)`);
+        const stmt = db.prepare(`INSERT INTO tournaments (name, max_players, status, created_by)
+            VALUES (?, ?, 'pending', ?)`);
 
-        const result = stmt.run(name, min_players, max_players, created_by);
-        console.log('Tournament Created Successfully!ID:', result.lastInsertRowid);
-        return { id: result.lastInsertRowid };
+        const result = stmt.run(name, max_players, created_by);
+        console.log('Tournament Created Successfully! ID:', result.lastInsertRowid);
+        return { 
+            id: result.lastInsertRowid, 
+            name: name, 
+            max_players: max_players,
+            status: 'pending',
+            created_by: created_by
+        };
     }
     catch(error){
-        console.error('SQL Error:', error); //debug
+        console.error('SQL Error:', error);
         throw error;
     }
 }
 
 //player join a specific tournament
-async function joinTournament(tournamentId, playerId, alias){
-    //make sure the tournament exists
-    const checkTournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
-    if(!checkTournament){
+async function joinTournament(tournamentId, playerAliases, userId){
+    // Check if tournament exists
+    const tournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
+    if(!tournament){
         throw new Error('Tournament not found');
     }
-    //make sure this player isnt joining the tournament for the second time
-    const checkPlayer = db.prepare('SELECT * FROM tournament_players WHERE tournament_id = ? AND player_id = ?').get(tournamentId, playerId);
-    if(checkPlayer){
-        throw new Error('Player already joined this tournament');
+
+    // Check if tournament is still pending
+    if(tournament.status !== 'pending'){
+        throw new Error('Tournament is not accepting new players');
     }
-    //make sure the tournament didnt exceed the limits of max players
-    //count how many players have already joined the tournament
-    const count = db.prepare('SELECT COUNT(*) as total FROM tournament_players WHERE tournament_id = ?').get(tournamentId).total;
-    if(count >= checkTournament.max_players){
-        throw new Error('This tournament is full');
+
+    // Validate aliases array
+    if(!Array.isArray(playerAliases) || playerAliases.length === 0){
+        throw new Error('Player aliases must be provided as an array');
     }
-    //make sure player input a nickname
-    if(!alias || alias.trim().length === 0){
-        throw new Error('Nickname is required for this tournament');
+
+    // Check if we have the right number of aliases for this tournament
+    if(playerAliases.length !== tournament.max_players){
+        throw new Error(`Tournament requires exactly ${tournament.max_players} players`);
     }
-    //check if the nickname entered is already used/exists
-    //select 1: because we dont want the database to return the entire row, we just want to check if the specfied data exists, if it does a 1 will be returned and if not the result will be null (nothing is returned)
-    const isAliasExists = db.prepare('SELECT 1 FROM tournament_players WHERE tournament_id = ? AND tournament_alias = ?').get(tournamentId, alias);
-    if(isAliasExists){
-        throw new Error('This nickname is already taken in this tournament');
+
+    // Validate each alias
+    playerAliases.forEach((alias, index) => {
+        if(!alias || alias.trim().length === 0){
+            throw new Error(`Player ${index + 1} alias is required`);
+        }
+        if(alias.length > 10){
+            throw new Error(`Player ${index + 1} alias cannot exceed 10 characters`);
+        }
+    });
+
+    // Check for duplicate aliases in the submission
+    const uniqueAliases = new Set(playerAliases);
+    if(uniqueAliases.size !== playerAliases.length){
+        throw new Error('All player aliases must be unique');
     }
-    db.prepare('INSERT INTO tournament_players (tournament_id, player_id, tournament_alias, status) VALUES (?, ?, ?)').run(tournamentId, playerId, alias);
-    return ({message: `Player ${playerId} has joined Tournament ${tournamentId} as ${alias}`});
+
+    // Check if tournament already has players
+    const existingCount = db.prepare('SELECT COUNT(*) as total FROM tournament_players WHERE tournament_id = ?').get(tournamentId).total;
+    if(existingCount > 0){
+        throw new Error('Tournament already has players registered');
+    }
+
+    try{
+        // Start transaction
+        const insertStmt = db.prepare('INSERT INTO tournament_players (tournament_id, player_id, tournament_alias, status) VALUES (?, ?, ?, ?)');
+        const updateTournamentStmt = db.prepare('UPDATE tournaments SET status = ? WHERE id = ?');
+
+        // Insert all players
+        playerAliases.forEach((alias, index) => {
+            insertStmt.run(tournamentId, userId, alias, 'joined');
+        });
+
+        // Update tournament status to started since it's now full
+        updateTournamentStmt.run('started', tournamentId);
+
+        return {
+            message: `Successfully registered ${playerAliases.length} players for tournament ${tournamentId}`,
+            tournament_id: tournamentId,
+            players: playerAliases,
+            status: 'started'
+        };
+    }
+    catch(error){
+        console.error('SQL Error:', error);
+        throw error;
+    }
 }
+
 
 
 
@@ -121,48 +167,6 @@ async function leaveTournament(tournamentId, playerId){
     return { message: `Player ${playerId} has left Tournament ${tournamentId}` };
 }
 
-//start the tournament
-async function startTournament(tournamentId){
-
-    const tournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
-    if(!tournament){
-        throw new Error('Tournament not found');
-    }
-
-
-    //check min and max players
-    const checkPlayersCount = db.prepare(`SELECT COUNT(*) as total FROM tournament_players WHERE tournament_id = ? AND status = 'joined'`).get(tournamentId).total;
-    if(checkPlayersCount > tournament.max_players){
-        throw new Error(`Too many players, maximun is ${tournament.max_players}`);
-    }
-    if(checkPlayersCount < tournament.min_players){
-        throw new Error(`Not enough players, minimum is &{tournament.min_players}`);
-    }
-
-    //shuffle players for matchmaking
-    //shuffle = randomize the list. matchmaking = take that list and create pairs (or groups)
-    //if we dont shuffle, players will be matched in the order the joined
-    const players = db.prepare(`SELECT player_id, tournament_alias 
-        FROM tournament_players
-        WHERE tournament_id = ? AND status = 'joined'
-        ORDER BY RANDOM()`).all(tournamentId);
-
-    //matchmaking (pair players into matches)
-    const matchMaking = [];
-    for(let i = 0; i < players.length; i += 2){
-        matchMaking.push({
-            player1: players[i],
-            player2: players[i + 1]
-        });
-    }
-
-    //check/update the status of the tournament (from pending to start)
-    db.prepare(`UPDATE tournaments SET status = 'started' WHERE id = ?`).run(tournamentId);
-
-
-    //return matchmaking so the fronted can show the players and who plays with who
-    return{ message: `Tournament ${tournament.name} has started!`, matchMaking};
-}
 
 
 
@@ -171,7 +175,5 @@ module.exports = {
     createTournament,
     joinTournament,
     getTournamentDetails,
-    leaveTournament,
-    startTournament
+    leaveTournament
 };
-
