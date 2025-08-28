@@ -6,19 +6,27 @@ const { createTournament} = require('../controllers/tournaments');
 const { joinTournament } = require('../controllers/tournaments');
 const { getTournamentDetails } = require('../controllers/tournaments');
 const { leaveTournament } = require('../controllers/tournaments');
-const { startTournament } = require('../controllers/tournaments');
-
 
 
 async function tournamentRoutes(fastify, options){
     //create a tournament
     fastify.post('/tournaments', async (request, reply) => {
         try{
-            const { name, min_players, max_players } = request.body;
-            const created_by = 3;
-            const tournament = await createTournament(name, created_by, min_players, max_players);
-            //use the message in createTournament and check
-            return reply.code(200).send({message: 'Tournament created successfully', tournamentId: tournament.id});
+            const { name, max_players, created_by } = request.body;
+
+            if(!name){
+                return reply.code(400).send({error: 'Tournament name is required'});
+            }
+            
+            if(max_players !== 4 && max_players !== 8){
+                return reply.code(400).send({error: 'Tournament can only have 4 or 8 maximum players'});
+            }
+
+            const tournament = await createTournament(name, created_by, max_players);
+            return reply.code(200).send({
+                message: 'Tournament created successfully', 
+                tournament: tournament
+            });
         }
         catch(error){
             return reply.code(400).send({error: error.message});
@@ -36,17 +44,18 @@ async function tournamentRoutes(fastify, options){
     fastify.post('/tournaments/:id/join', async (request, reply) => {
         try{
             const tournament_id = Number(request.params.id);
-            //take the player_id from the auth user
-            const { player_id } = request.body;
-            if(!player_id){
-                return reply.code(400).send({error: 'player_id is required'});
+            const { playerAliases, userId } = request.body;
+            
+            if(!playerAliases || !userId){
+                return reply.code(400).send({error: 'Player aliases and user ID are required'});
             }
-            const join = await joinTournament(tournament_id, player_id);
-            return reply.code(200).send(join);
+
+            const result = await joinTournament(tournament_id, playerAliases, userId);
+            return reply.code(200).send(result);
         }
         catch(error){
-            fastify.log.error("joining error:", error);
-            return reply.code(400).send({error: error.message}); //debug
+            fastify.log.error("Tournament join error:", error);
+            return reply.code(400).send({error: error.message});
         }
     });
 
@@ -100,22 +109,8 @@ async function tournamentRoutes(fastify, options){
             return reply.code(404).send({ error: error.message });
         }
     }); 
-
-
-    //start the tournament
-    fastify.post('/tournaments/:id/start', async (request, reply) => {
-        try{
-            const tournamentId = Number(request.params.id);
-            const result = await startTournament(tournamentId);
-            return reply.code(200).send(result);
-        }
-        catch(error){
-            return reply.code(400).send({ error: error.message });
-        }
-    });
     
 }
 
 
 module.exports = tournamentRoutes;
-
