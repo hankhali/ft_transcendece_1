@@ -9,8 +9,7 @@ const { userLogIn } = require('../controllers/users');
 const { deleteUserById } = require('../controllers/users');
 const { getUserdata } = require('../controllers/users');
 const { getPublicProfile } = require('../controllers/users');
-const { updateUserProfile } = require('../controllers/users');
-
+const { setUserAlias } = require('../controllers/users');
 const db = require('../queries/database');
 
 
@@ -18,16 +17,35 @@ const db = require('../queries/database');
 async function userRoutes(fastify, options){
     fastify.post('/register', async (request, reply) => {
         try{
-            const { username, password, email, alias } = request.body;
-            if(!username || !password || !email || !alias){
-                return reply.code(400).send({error: 'All fields are required!'});
+            const { username, password, email } = request.body;
+            if(!username || !password || !email){
+                return reply.code(400).send({error: 'Username, password, and email are required!'});
             }
-            const newUser = await createUser(username, password, email, alias);
-            return reply.code(200).send({message: 'User registered successfully', userId: newUser.id});
+            const newUser = await createUser(username, password, email);
+            return reply.code(200).send({
+                message: 'User registered successfully', 
+                userId: newUser.id
+            });
         }
         catch(error){
-            fastify.log.error("Registeration error:", error);
-            return reply.code(500).send({error: error.message}); //debug
+            fastify.log.error("Registration error:", error);
+            return reply.code(500).send({error: error.message});
+        }
+    });
+
+    //route for setting alias
+    fastify.post('/set-alias', async (request, reply) => {
+        try{
+            const { userId, alias } = request.body;
+            if(!userId || !alias){
+                return reply.code(400).send({error: 'User ID and alias are required!'});
+            }
+            const result = await setUserAlias(userId, alias);
+            return reply.code(200).send(result);
+        }
+        catch(error){
+            fastify.log.error("Set alias error:", error);
+            return reply.code(500).send({error: error.message});
         }
     });
 
@@ -127,23 +145,6 @@ async function userRoutes(fastify, options){
             return reply.code(400).send({error: error.message});
         }
     });
-
-    //update user profile (username, nickname, password, avatar)
-    fastify.patch('/me', async (request, reply) => {
-        try{
-            const {userId, username, alias, password, oldPassword} = request.body;
-            if(!userId){
-                return reply.code(400).send({ error:'user id is required'});
-            }
-            const updates = { username, alias, password, oldPassword };
-            const updateProfile = await updateUserProfile(userId, updates);
-            return reply.code(200).send(updateProfile);
-        }
-        catch(error){
-            return reply.code(400).send({error: error.message});
-        }
-    });
 }
-
 
 module.exports = userRoutes;
