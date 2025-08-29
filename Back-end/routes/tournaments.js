@@ -6,6 +6,7 @@ const { createTournament} = require('../controllers/tournaments');
 const { joinTournament } = require('../controllers/tournaments');
 const { getTournamentDetails } = require('../controllers/tournaments');
 const { leaveTournament } = require('../controllers/tournaments');
+const { startTournament } = require('../controllers/tournaments');
 
 
 async function tournamentRoutes(fastify, options){
@@ -109,6 +110,18 @@ async function tournamentRoutes(fastify, options){
             return reply.code(404).send({ error: error.message });
         }
     }); 
+
+     //start the tournament
+    fastify.post('/tournaments/:id/start', async (request, reply) => {
+        try{
+            const tournamentId = Number(request.params.id);
+            const result = await startTournament(tournamentId);
+            return reply.code(200).send(result);
+        }
+        catch(error){
+            return reply.code(400).send({ error: error.message });
+        }
+    });
     
 }
 
