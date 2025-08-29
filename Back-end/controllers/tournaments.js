@@ -167,7 +167,58 @@ async function leaveTournament(tournamentId, playerId){
     return { message: `Player ${playerId} has left Tournament ${tournamentId}` };
 }
 
+//start the tournament
+async function startTournament(tournamentId){
 
+    const tournament = db.prepare('SELECT * FROM tournaments WHERE id = ?').get(tournamentId);
+    if(!tournament){
+        throw new Error('Tournament not found');
+    }
+
+    //prevent starting the tournament twice
+    if(tournament.status !== 'pending'){//meaning it started
+        throw new Error(`Tournament is already ${tournament.status}`);//it should show started
+    }
+    //check min and max players
+    const checkPlayersCount = db.prepare(`SELECT COUNT(*) as total
+        FROM tournament_players WHERE tournament_id = ?
+        AND status = 'joined'`).get(tournamentId).total;
+
+    if(checkPlayersCount > tournament.max_players){
+        throw new Error(`Too many players, maximun is ${tournament.max_players}`);
+    }
+    if(checkPlayersCount < tournament.min_players){
+        throw new Error(`Not enough players, minimum is ${tournament.min_players}`);
+    }
+
+    //shuffle players for matchmaking
+    //shuffle = randomize the list. matchmaking = take that list and create pairs (or groups)
+    //if we dont shuffle, players will be matched in the order the joined
+    const players = db.prepare(`SELECT player_id, tournament_alias 
+        FROM tournament_players
+        WHERE tournament_id = ? AND status = 'joined'
+        ORDER BY RANDOM()`).all(tournamentId);
+
+    //matchmaking (pair players into matches)
+    const matchMaking = [];
+    for(let i = 0; i < players.length; i += 2){
+        const player1 = players[i];
+        const player2 = players[i + 1];
+        matchMaking.push({ player1, player2 });
+
+
+        //insert match into game_history as pending
+        db.prepare(`INSERT INTO game_history (user_id, opponent_id, opponent_type, difficulty, user_score, result, tournament_id)
+            VALUES (?, ?, 'PLAYER', NULL, 0, 0, 'pending', ?)`).run(player1.player_id, player2.player_id, tournamentId);
+    }
+
+    //check/update the status of the tournament (from pending to start)
+    db.prepare(`UPDATE tournaments SET status = 'started' WHERE id = ?`).run(tournamentId);
+
+
+    //return matchmaking so the fronted can show the players and who plays with who
+    return{ message: `Tournament ${tournament.name} has started!`, matchMaking};
+}
 
 
 
@@ -175,5 +226,6 @@ module.exports = {
     createTournament,
     joinTournament,
     getTournamentDetails,
-    leaveTournament
+    leaveTournament,
+    startTournament
 };
