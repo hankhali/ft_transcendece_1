@@ -1,0 +1,276 @@
+/* Controls Container */
+.controls-container {
+  display: flex !important;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  padding: 0 10px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-left: 10px;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1000;
+}
+
+/* Language Switcher Styles */
+.language-switcher-container {
+  display: flex !important;
+  align-items: center;
+  height: 100%;
+  position: relative;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-width: 120px;
+}
+
+.language-switcher {
+  margin: 0;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+}
+
+.language-select {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: var(--text-color) !important;
+  padding: 8px 25px 8px 10px !important;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 36px;
+  font-family: inherit;
+  min-width: 120px;
+  text-align: left;
+  margin: 0;
+  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  background-position: right 8px center;
+  background-size: 12px;
+  border-radius: 4px;
+}
+
+.language-select:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.language-select:focus {
+  box-shadow: 0 0 0 2px rgba(0, 230, 255, 0.3);
+}
+
+/* Style the dropdown arrow */
+.language-select::-ms-expand {
+  display: none;
+}
+
+/* Style options */
+.language-select option {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 10px;
+  border: none;
+}
+
+/* Style the selected option */
+.language-select option:checked {
+  background-color: var(--primary-color);
+  color: #000;
+}
+
+.language-select:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(0, 230, 255, 0.2);
+}
+
+.language-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Dark theme for dropdown options */
+.language-select option {
+  background-color: #1a1a2e;
+  color: #fff;
+  padding: 10px;
+}
+
+/* Language Confirmation Modal */
+.language-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.language-confirm-content {
+  background: var(--bg-color, #1a1a2e);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--primary-color, #6c63ff);
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+.language-confirm-content h3 {
+  margin-top: 0;
+  color: var(--text-color, #fff);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.language-confirm-content p {
+  color: var(--text-secondary, #b8b8cc);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.language-confirm-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.language-confirm-buttons .btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.language-confirm-buttons .btn-primary {
+  background: var(--primary-color, #6c63ff);
+  color: white;
+}
+
+.language-confirm-buttons .btn-primary:hover {
+  background: var(--primary-hover, #5a50e5);
+  transform: translateY(-1px);
+}
+
+.language-confirm-buttons .btn-secondary {
+  background: transparent;
+  color: var(--text-color, #fff);
+  border: 1px solid var(--border-color, #33334d);
+}
+
+.language-confirm-buttons .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Language Feedback Message */
+.language-feedback {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success-color, #4caf50);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.language-feedback.fade-out {
+  opacity: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin: 10px 0 0;
+    padding: 10px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 8px;
+    background: transparent;
+  }
+  
+  .language-switcher-container {
+    width: 100%;
+    justify-content: flex-start;
+    margin: 5px 0;
+  }
+  
+  .language-select {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 8px 25px 8px 0;
+    background-position: right 5px center;
+  }
+  
+  .language-confirm-content {
+    width: 85%;
+    padding: 1.5rem;
+  }
+  
+  .language-confirm-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .language-confirm-buttons .btn {
+    width: 100%;
+  }
+  
+  .language-feedback {
+    width: 90%;
+    text-align: center;
+    bottom: 1rem;
+  }
+}

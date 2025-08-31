@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="neon_pong_title">Neon Pong - The Ultimate Retro-Futuristic Arcade</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <link rel="stylesheet" href="/src/language.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Language switcher will be added by language.ts -->
+  </head>
+  <body>
+    <div class="background-animation-container">
+        <div id="starfield"></div>
+
+        <div class="grid-overlay"></div> <div class="glow-effect"></div>
+        <div class="surface"></div>
+        <div class="ball"></div>
+        <div class="ball-shadow"></div>
+
+        <div class="ambient-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+    <div id="app">
+        <!-- Navbar will be inserted here by JavaScript -->
+        <div id="language-switcher-container"></div>
+        <!-- Navbar links will be inserted by JavaScript -->
+
+        <main class="page">
+            <div id="home" class="hero-section content-section">
+                <img src="./ping.png" alt="Ping Pong Paddle" class="ping-pong-paddle">
+                <h1 class="hero-title" data-i18n="neon_pong_title">NEON PONG</h1>
+                <h2 class="hero-subtitle" data-i18n="hero_subtitle">THE ULTIMATE RETRO-FUTURISTIC ARCADE EXPERIENCE.</h2>
+                <p class="hero-description" data-i18n="hero_description">Challenge your friends in a fast-paced game of skill and reflexes.</p>
+                <div class="hero-cta">
+                    <button class="primary-button play-now-button" data-i18n="play_now_button"><i class="fas fa-play"></i> Play Now</button>
+                    <button class="primary-button register-cta-button" data-i18n="register_now_button"><i class="fas fa-user-plus"></i> Register Now</button>
+                </div>
+            </div>
+
+            <div id="about" class="content-section">
+                <h2 class="section-title" data-i18n="about_project_title">About the Project</h2>
+                <div class="about-project-content">
+                    <div class="about-project-text">
+                        <p>Welcome to Neon Pong, a modern re-imagination of the classic arcade game. Built with cutting-edge web technologies, we bring you a fast-paced, visually stunning, and highly competitive experience.</p>
+                        <p>Our goal is to combine nostalgic gameplay with futuristic aesthetics and community-driven features. Join us and relive the golden era of arcade gaming, but with a twist!</p>
+                        <p>We are a team of passionate developers dedicated to creating engaging and innovative gaming experiences.</p>
+                    </div>
+                    <div class="about-project-image-frame">
+                        <img src="./assets/pong-screenshot.png" alt="Neon Pong Screenshot">
+                    </div>
+                </div>
+            </div>
+
+<div id="tournaments" class="tournament-types-section content-section">
+                <h2 class="section-title" style="margin-top: 4rem;" data-i18n="upcoming_tournaments">Upcoming Tournaments</h2>
+                <div class="tournament-list">
+                    <div class="tournament-item">
+                        <h3>Neon Cup #1</h3>
+                        <p class="tournament-status"><span class="status-indicator status-open"></span> <span data-i18n="open_for_registration">Open for Registration</span></p>
+                        <p><strong>Starts:</strong> June 10, 2025</p>
+                        <p><strong>Prize Pool:</strong> $1000</p>
+                        <button class="primary-button join-button">Join Tournament</button>
+                    </div>
+                    <div class="tournament-item">
+                        <h3>Cybernetic Showdown</h3>
+                        <p class="tournament-status"><span class="status-indicator status-in-progress"></span> <span data-i18n="in_progress">In Progress</span></p>
+                        <p><strong>Ends:</strong> June 15, 2025</p>
+                        <p><strong>Prize Pool:</strong> $500</p>
+                        <button class="primary-button join-button" disabled>View Progress</button>
+                    </div>
+                    <div class="tournament-item">
+                        <h3>Retro Rumble</h3>
+                        <p class="tournament-status"><span class="status-indicator status-completed"></span> <span data-i18n="completed">Completed</span></p>
+                        <p><strong>Date:</strong> May 28, 2025</p>
+                        <p><strong>Winner:</strong> PlayerX</p>
+                        <button class="secondary-button">View Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="team" class="content-section">
+                <h2 class="section-title" data-i18n="meet_the_team">Meet the Team</h2>
+                <div class="team-grid">
+                    <div class="team-member-card">
+                        <img src="./assets/avatar-1.png" alt="Team Member 1" class="team-member-avatar">
+                        <p class="team-member-name">Alice Smith</p>
+                        <p class="team-member-role">Lead Developer</p>
+                    </div>
+                    <div class="team-member-card">
+                        <img src="./assets/avatar-2.png" alt="Team Member 2" class="team-member-avatar">
+                        <p class="team-member-name">Bob Johnson</p>
+                        <p class="team-member-role">Game Designer</p>
+                    </div>
+                    <div class="team-member-card">
+                        <img src="./assets/avatar-3.png" alt="Team Member 3" class="team-member-avatar">
+                        <p class="team-member-name">Charlie Brown</p>
+                        <p class="team-member-role">UI/UX Artist</p>
+                    </div>
+                    <div class="team-member-card">
+                        <img src="./assets/avatar-4.png" alt="Team Member 4" class="team-member-avatar">
+                        <p class="team-member-name">Diana Prince</p>
+                        <p class="team-member-role">Community Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="register" class="content-section">
+                <h2 class="section-title" data-i18n="register_for_neon_pong">Register for Neon Pong</h2>
+                <div class="form-container">
+                    <h3 class="form-title" data-i18n="create_your_account">Create Your Account</h3>
+                    <form id="registrationForm">
+                        <label for="username" class="form-label" data-i18n="username">Username</label>
+                        <input type="text" id="username" class="form-input" placeholder="Enter your username" data-i18n-placeholder="enter_username" required>
+
+                        <label for="email" class="form-label" data-i18n="email">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email" data-i18n-placeholder="enter_email" required>
+
+                        <label for="password" class="form-label" data-i18n="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Create a password" data-i18n-placeholder="create_password" required>
+
+                        <label for="confirmPassword" class="form-label" data-i18n="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password" data-i18n-placeholder="confirm_your_password" required>
+
+                        <button type="submit" class="primary-button" data-i18n="register">Register</button>
+                        <button type="button" class="secondary-button back-button" data-i18n="back_to_home">Back to Home</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Neon Pong. All rights reserved.</p>
+            <p>Made with <i class="fas fa-heart" style="color: var(--secondary-color);"></i> by Four Innovative Minds.</p>
+        </footer>
+
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p class="loading-text" data-i18n="loading">Loading...</p>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+        // Create dynamic trail effect
+        const ball = document.querySelector('.ball');
+        // Renamed 'container' to 'backgroundContainer' to avoid conflict with existing classes if any
+        const backgroundContainer = document.querySelector('.background-animation-container');
+
+        function createTrail() {
+            // Ensure elements exist before trying to get their positions
+            if (!ball || !backgroundContainer) {
+                // If elements aren't found (e.g., due to loading order), stop trying to create trails.
+                // This console warning helps debugging if the script runs before elements are parsed.
+                console.warn("Ball or background container not found for trail effect. Stopping trail creation.");
+                if (typeof trailInterval !== 'undefined') clearInterval(trailInterval); // Stop the interval if elements are missing
+                return;
+            }
+
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+
+            const ballRect = ball.getBoundingClientRect();
+            const containerRect = backgroundContainer.getBoundingClientRect();
+
+            // Calculate position relative to the background-animation-container
+            trail.style.left = (ballRect.left - containerRect.left + (ballRect.width / 2)) + 'px'; // Center trail horizontally
+            trail.style.bottom = (window.innerHeight - ballRect.bottom - containerRect.top + (ballRect.height / 2)) + 'px'; // Center trail vertically, adjusted for container top
+
+            backgroundContainer.appendChild(trail);
+
+            // Remove trail after animation
+            setTimeout(() => {
+                if (trail.parentNode) {
+                    trail.parentNode.removeChild(trail);
+                }
+            }, 800);
+        }
+
+        // Create trail particles periodically, only if elements are present
+        let trailInterval;
+        if (ball && backgroundContainer) {
+            trailInterval = setInterval(createTrail, 100);
+        }
+
+        // Add subtle camera shake effect to the main content
+        let shakeOffset = 0;
+        const appContainer = document.getElementById('app');
+
+        function cameraShake() {
+            // Only apply shake if the #app container exists
+            if (appContainer) {
+                shakeOffset += 0.05;
+                const shake = Math.sin(shakeOffset) * 0.5; // Reduced shake for subtlety
+                appContainer.style.transform = `translateY(${shake}px)`;
+            }
+            requestAnimationFrame(cameraShake);
+        }
+        // Start camera shake only if appContainer exists
+        if (appContainer) {
+          cameraShake();
+        }
+
+
+        // Dynamic glow intensity based on ball position
+        const glowEffect = document.querySelector('.glow-effect');
+        function updateGlow() {
+            // Only update glow if the element exists
+            if (glowEffect) {
+                const time = Date.now() * 0.001;
+                const intensity = 0.5 + Math.sin(time * 2) * 0.3;
+                glowEffect.style.opacity = intensity.toFixed(2);
+            }
+            requestAnimationFrame(updateGlow);
+        }
+        if (glowEffect) {
+           updateGlow(); // Start glow update
+        }
+
+
+        // ========================================================
+        // NEW JAVASCRIPT FOR VISUAL ENHANCEMENTS
+        // ========================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const starfield = document.getElementById('starfield');
+
+            // 1. Create Stars
+            function createStars() {
+                if (!starfield) return;
+                starfield.innerHTML = ''; // Clear existing stars if any
+                const numStars = 350; // Increased number of stars for more frequency
+                for (let i = 0; i < numStars; i++) {
+                    let star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = `${Math.random() * 2 + 1}px`; // Star size 1px to 3px
+                    star.style.height = star.style.width;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`; // Start at random vertical position
+                    // Ensure animation moves them "up" the screen, so they appear from bottom or mid and move towards top
+                    star.style.animationDuration = `${Math.random() * 8 + 4}s`; // Faster animation (4s to 12s)
+                    star.style.animationDelay = `${Math.random() * 5}s`; // Shorter delay (0s to 5s) for more frequency
+                    star.style.setProperty('--star-translate-x-end', `${(Math.random() - 0.5) * 30}vw`); // Random slight horizontal drift
+                    starfield.appendChild(star);
+                }
+            }
+
+            if (starfield) {
+                createStars();
+            }
+        });
+    </script>
+    </body>
+</html>
