@@ -670,28 +670,32 @@ p {
 .hero-cta {
   animation: fadeInUp 0.8s ease-out 0.4s both;
   display: flex;
-  gap: 1.5rem; /* Increased gap slightly for better visual separation */
+  gap: 1.5rem; /* Space between buttons */
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap; /* Allow buttons to wrap if screen is very small */
+  flex-wrap: nowrap; /* Prevent buttons from wrapping */
+  width: 100%;
+  max-width: 700px; /* Slightly wider container for better button spacing */
+  margin: 0 auto; /* Center the button container */
 }
 
-/* Specific styling for buttons within hero-cta to ensure alignment */
-.hero-cta .primary-button,
-.hero-cta .register-cta-button {
-  background: linear-gradient(90deg, #FF00FF 0%, #00E6FF 100%);
-  color: var(--white);
-  padding: 1rem 3rem;
-  font-size: 1.2rem;
-  font-weight: 700;
-  border-radius: var(--border-radius-full);
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7);
+/* Hero CTA Buttons */
+.hero-cta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.hero-cta .primary-button {
+  margin: 0;
+  min-width: 200px;
   animation: pulseButton 1.5s infinite alternate;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: all var(--transition-normal);
-  border: none; /* Ensure no default button border */
-  margin-bottom: 0;
 }
 
 .hero-cta .play-now-button:hover,
@@ -1032,46 +1036,51 @@ Make sure the hero section is also transparent to let the background animation s
 /* Buttons */
 button {
   font-family: 'Poppins', sans-serif;
-  font-weight: 500;
+  font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  border-radius: var(--border-radius-full);
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  padding: 1.1rem 3.5rem;
+  font-size: 1.2rem;
+  white-space: nowrap;
 }
 
 .primary-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: var(--white);
-  box-shadow: var(--neon-gradient-glow);
+  background: linear-gradient(90deg, #FF00FF 0%, #00E6FF 100%);
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7);
 }
 
 .primary-button:hover {
-  box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.9), 0 0 40px rgba(0, 230, 255, 0.9);
+  background: linear-gradient(90deg, #00E6FF 0%, #FF00FF 100%);
 }
 
 .primary-button:active {
   transform: translateY(0);
-  box-shadow: var(--neon-gradient-glow);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(0, 230, 255, 0.7);
 }
 
 .secondary-button {
-  background-color: transparent;
+  background: transparent;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
-  box-shadow: var(--neon-blue-glow);
+  box-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
+  padding: calc(1.1rem - 2px) calc(3.5rem - 2px); /* Account for border */
 }
 
 .secondary-button:hover {
-  background-color: rgba(0, 230, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px var(--primary-color);
+  background: rgba(0, 230, 255, 0.1);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 15px rgba(0, 230, 255, 0.7);
 }
 
 .secondary-button:active {
