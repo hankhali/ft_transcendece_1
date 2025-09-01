@@ -651,8 +651,35 @@ function renderAuthPage(isLogin = true): HTMLElement {
     const newPath = isLogin ? "/register" : "/login";
     navigateTo(newPath);
   });
-  toggleText.appendChild(document.createTextNode(isLogin ? "Don't have an ACCOUNT? " : "Already have an ACCOUNT? "));
-  toggleText.appendChild(toggleLink);
+  // Create container for the toggle text
+  const toggleContainer = document.createElement('div');
+  toggleContainer.className = 'toggle-text-container';
+  
+  // Create the text node with proper styling
+  const textNode = document.createElement('span');
+  textNode.className = 'toggle-text';
+  textNode.textContent = isLogin ? "Don't have an account? " : "Already have an account? ";
+  
+  // Style the toggle link
+  toggleLink.className = 'toggle-link neon-text';
+  toggleLink.style.marginLeft = '4px';
+  toggleLink.style.textDecoration = 'none';
+  toggleLink.style.transition = 'all 0.3s ease';
+  toggleLink.style.fontWeight = '600';
+  
+  // Add hover effect
+  toggleLink.addEventListener('mouseenter', () => {
+    toggleLink.style.textShadow = '0 0 10px rgba(99, 102, 241, 0.8)';
+  });
+  
+  toggleLink.addEventListener('mouseleave', () => {
+    toggleLink.style.textShadow = 'none';
+  });
+  
+  // Append elements
+  toggleContainer.appendChild(textNode);
+  toggleContainer.appendChild(toggleLink);
+  toggleText.appendChild(toggleContainer);
 
   // Form title
   const title = document.createElement("h2");
@@ -663,15 +690,6 @@ function renderAuthPage(isLogin = true): HTMLElement {
   const form = document.createElement("form");
   form.noValidate = true;
 
-  // Username field (always shown)
-  const usernameLabel = document.createElement("label");
-  usernameLabel.className = "form-label";
-  usernameLabel.textContent = "Username";
-  const usernameInput = document.createElement("input");
-  usernameInput.type = "text";
-  usernameInput.className = "form-input";
-  usernameInput.required = true;
-  
   // Email field (only for registration)
   let emailInput: HTMLInputElement | null = null;
   if (!isLogin) {
@@ -682,10 +700,21 @@ function renderAuthPage(isLogin = true): HTMLElement {
     emailInput.type = "email";
     emailInput.className = "form-input";
     emailInput.required = true;
+    emailInput.placeholder = "Enter your email";
     form.appendChild(emailLabel);
     form.appendChild(emailInput);
   }
 
+  // Username field (always shown)
+  const usernameLabel = document.createElement("label");
+  usernameLabel.className = "form-label";
+  usernameLabel.textContent = "Username";
+  const usernameInput = document.createElement("input");
+  usernameInput.type = "text";
+  usernameInput.className = "form-input";
+  usernameInput.required = true;
+  usernameInput.placeholder = "Choose a username";
+  
   // Password field (always shown)
   const passwordLabel = document.createElement("label");
   passwordLabel.className = "form-label";
@@ -694,19 +723,20 @@ function renderAuthPage(isLogin = true): HTMLElement {
   passwordInput.type = "password";
   passwordInput.className = "form-input";
   passwordInput.required = true;
+  passwordInput.placeholder = "Create a password";
 
   // Confirm Password (only for registration)
   let confirmPasswordInput: HTMLInputElement | null = null;
+  let confirmLabel: HTMLLabelElement | null = null;
   if (!isLogin) {
-    const confirmLabel = document.createElement("label");
+    confirmLabel = document.createElement("label");
     confirmLabel.className = "form-label";
     confirmLabel.textContent = "Confirm Password";
     confirmPasswordInput = document.createElement("input");
     confirmPasswordInput.type = "password";
     confirmPasswordInput.className = "form-input";
     confirmPasswordInput.required = true;
-    form.appendChild(confirmLabel);
-    form.appendChild(confirmPasswordInput);
+    confirmPasswordInput.placeholder = "Confirm your password";
   }
 
   // Submit button
@@ -722,11 +752,31 @@ function renderAuthPage(isLogin = true): HTMLElement {
   backButton.textContent = "Back to Home";
   backButton.addEventListener("click", () => navigateTo("/"));
 
-  // Assemble the form
+  // Add elements to form in the correct order
+  if (!isLogin) {
+    // Email field is already added for registration
+    form.appendChild(document.createElement('br'));
+  }
+  
+  // Add username
   form.appendChild(usernameLabel);
   form.appendChild(usernameInput);
+  form.appendChild(document.createElement('br'));
+  
+  // Add password
   form.appendChild(passwordLabel);
   form.appendChild(passwordInput);
+  
+  // Add confirm password for registration
+  if (!isLogin && confirmPasswordInput && confirmLabel) {
+    form.appendChild(document.createElement('br'));
+    form.appendChild(confirmLabel);
+    form.appendChild(confirmPasswordInput);
+  }
+  
+  if (isLogin) {
+    form.appendChild(document.createElement('br'));
+  }
   form.appendChild(submitButton);
   form.appendChild(backButton);
   

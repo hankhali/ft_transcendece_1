@@ -2,40 +2,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const loginTab = document.getElementById('loginTab');
-    const registerTab = document.getElementById('registerTab');
-    const showLogin = document.getElementById('showLogin');
-    const showRegister = document.getElementById('showRegister');
+    const authToggle = document.getElementById('authToggle');
     const passwordInput = document.getElementById('password');
     const strengthText = document.getElementById('strengthText');
     const strengthSegments = document.querySelectorAll('.strength-segment');
 
     // Toggle between login and register forms
-    function showForm(formToShow) {
-        if (formToShow === 'login') {
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-        } else {
+    function toggleForms() {
+        const isRegister = authToggle.checked;
+        if (isRegister) {
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
-            loginTab.classList.remove('active');
-            registerTab.classList.add('active');
+            document.title = 'Sign Up | Neon Pong';
+        } else {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            document.title = 'Sign In | Neon Pong';
         }
     }
 
-    // Event Listeners for form toggling
-    loginTab.addEventListener('click', () => showForm('login'));
-    registerTab.addEventListener('click', () => showForm('register'));
-    showLogin?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showForm('login');
-    });
-    showRegister?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showForm('register');
-    });
+    // Initialize forms
+    toggleForms();
+
+    // Event Listener for toggle switch
+    authToggle.addEventListener('change', toggleForms);
 
     // Password strength meter
     if (passwordInput) {
