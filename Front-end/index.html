@@ -8,6 +8,44 @@
     <link rel="stylesheet" href="/src/style.css">
     <link rel="stylesheet" href="/src/language.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      /* Force remove red borders from language switcher */
+      .language-select,
+      .language-select:focus,
+      .language-select:active,
+      .language-select:hover,
+      .language-switcher,
+      .language-switcher-container,
+      #language-switcher-container {
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Style the select element */
+      .language-select {
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 20px;
+        padding: 8px 30px 8px 15px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+      }
+      
+      /* Style the dropdown options */
+      .language-select option {
+        background: #1a1a2e;
+        color: white;
+        padding: 10px;
+      }
+    </style>
     <!-- Language switcher will be added by language.ts -->
   </head>
   <body>
@@ -33,7 +71,6 @@
 
         <main class="page">
             <div id="home" class="hero-section content-section">
-                <img src="./ping.png" alt="Ping Pong Paddle" class="ping-pong-paddle">
                 <h1 class="hero-title" data-i18n="neon_pong_title">NEON PONG</h1>
                 <h2 class="hero-subtitle" data-i18n="hero_subtitle">THE ULTIMATE RETRO-FUTURISTIC ARCADE EXPERIENCE.</h2>
                 <p class="hero-description" data-i18n="hero_description">Challenge your friends in a fast-paced game of skill and reflexes.</p>
@@ -113,7 +150,7 @@
             <div id="register" class="content-section">
                 <h2 class="section-title" data-i18n="register_for_neon_pong">Register for Neon Pong</h2>
                 <div class="form-container">
-                    <h3 class="form-title" data-i18n="create_your_account">Create Your Account</h3>
+                    <h3 class="form-title" data-i18n="create_your_ACCOUNT">Create Your ACCOUNT</h3>
                     <form id="registrationForm">
                         <label for="username" class="form-label" data-i18n="username">Username</label>
                         <input type="text" id="username" class="form-input" placeholder="Enter your username" data-i18n-placeholder="enter_username" required>

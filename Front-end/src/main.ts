@@ -214,10 +214,23 @@ function createNavbar(): HTMLElement {
   const navLinks = document.createElement("div");
   navLinks.className = "navbar-links";
   
-  // Language switcher container - will be populated by initLanguage()
+  // Create the language switcher container
+  console.log('[Navbar] Creating language switcher container...');
   const languageSwitcherContainer = document.createElement("div");
   languageSwitcherContainer.id = "language-switcher-container";
   languageSwitcherContainer.className = "language-switcher-container";
+  // Force remove any red borders
+  languageSwitcherContainer.style.border = 'none';
+  languageSwitcherContainer.style.outline = 'none';
+  languageSwitcherContainer.style.boxShadow = 'none';
+  
+  // Add a temporary placeholder for the language switcher
+  const placeholder = document.createElement('div');
+  placeholder.className = 'language-switcher';
+  placeholder.innerHTML = 'Loading languages...';
+  languageSwitcherContainer.appendChild(placeholder);
+  
+  console.log('[Navbar] Language switcher container created:', languageSwitcherContainer);
   navLinks.setAttribute("role", "menubar"); // Role for menu bar
   const homeLink = document.createElement("a");
   homeLink.href = "/";
@@ -239,34 +252,80 @@ function createNavbar(): HTMLElement {
     e.preventDefault();
     navigateTo("/tournament");
   });
-  const registerLink = document.createElement("a");
-  registerLink.href = "/register";
-  registerLink.className = "navbar-link";
-  registerLink.setAttribute('data-i18n', 'register');
-  registerLink.textContent = "Register";
-  registerLink.setAttribute("role", "menuitem");
-  registerLink.addEventListener("click", (e) => {
+  // Combined ACCOUNT tab that toggles between login/register
+  const ACCOUNTLink = document.createElement("a");
+  ACCOUNTLink.href = "/ACCOUNT";
+  ACCOUNTLink.className = "navbar-link";
+  ACCOUNTLink.setAttribute('data-i18n', 'SIGN IN/SIGN UP');
+  ACCOUNTLink.textContent = "ACCOUNT";
+  ACCOUNTLink.setAttribute("role", "menuitem");
+  ACCOUNTLink.addEventListener("click", (e) => {
     e.preventDefault();
-    navigateTo("/register");
-  });
-  const loginLink = document.createElement("a");
-  loginLink.href = "/login";
-  loginLink.className = "navbar-link";
-  loginLink.setAttribute('data-i18n', 'login');
-  loginLink.textContent = "Login";
-  loginLink.setAttribute("role", "menuitem");
-  loginLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    navigateTo("/login");
+    const currentPath = window.location.pathname;
+    if (currentPath === "/login" || currentPath === "/register") {
+      // Toggle between login and register
+      const newPath = currentPath === "/login" ? "/register" : "/login";
+      navigateTo(newPath);
+    } else {
+      // Default to login page
+      navigateTo("/login");
+    }
   });
   navLinks.appendChild(homeLink);
   navLinks.appendChild(tournamentsLink);
-  navLinks.appendChild(registerLink);
-  navLinks.appendChild(loginLink);
+  navLinks.appendChild(ACCOUNTLink);
+  
   // Accessibility Controls
   const accessibilityControls = document.createElement('div');
   accessibilityControls.className = 'accessibility-controls';
   accessibilityControls.setAttribute('aria-label', 'Accessibility controls');
+  
+  // Add language switcher to accessibility controls
+  console.log('Adding language switcher to accessibility controls');
+  
+  // Force display and visibility
+  languageSwitcherContainer.style.display = 'flex';
+  languageSwitcherContainer.style.visibility = 'visible';
+  languageSwitcherContainer.style.opacity = '1';
+  languageSwitcherContainer.style.position = 'relative';
+  languageSwitcherContainer.style.zIndex = '1000';
+  languageSwitcherContainer.style.minWidth = '150px';
+  languageSwitcherContainer.style.height = '40px';
+  languageSwitcherContainer.style.alignItems = 'center';
+  languageSwitcherContainer.style.justifyContent = 'center';
+  languageSwitcherContainer.style.border = '2px solid red';
+  languageSwitcherContainer.style.padding = '10px';
+  languageSwitcherContainer.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+  
+  // Make sure the select is visible
+  const select = languageSwitcherContainer.querySelector('select');
+  if (select) {
+    console.log('Found select element in language switcher');
+    select.style.color = 'white';
+    select.style.backgroundColor = '#1a1a2e';
+    select.style.border = '1px solid #00e6ff';
+    select.style.borderRadius = '4px';
+    select.style.padding = '5px';
+    select.style.minWidth = '120px';
+    select.style.fontSize = '14px';
+    select.style.cursor = 'pointer';
+  } else {
+    console.error('No select element found in language switcher!');
+  }
+  
+  console.log('Language switcher container before append:', languageSwitcherContainer.outerHTML);
+  accessibilityControls.appendChild(languageSwitcherContainer);
+  console.log('Accessibility controls after appending language switcher:');
+  console.log(accessibilityControls.outerHTML);
+  
+  // Verify it's actually in the DOM
+  setTimeout(() => {
+    const checkElement = document.getElementById('language-switcher-container');
+    console.log('DOM check - language switcher container:', checkElement);
+    if (checkElement) {
+      console.log('Language switcher container styles:', window.getComputedStyle(checkElement));
+    }
+  }, 1000);
   // High Contrast Toggle
   const highContrastBtn = document.createElement('button');
   highContrastBtn.className = 'accessibility-btn';
@@ -398,8 +457,6 @@ function renderHomePage(): HTMLElement {
   const heroSection = document.createElement("section");
   heroSection.className = "hero-section content-section";
   const paddleImage = document.createElement("img");
-  // paddleImage.src = './ping.png'; // Corrected path
-  // paddleImage.alt = 'Stylized neon ping pong paddle';
   paddleImage.className = "ping-pong-paddle";
   const heroTitle = document.createElement("h1");
   heroTitle.className = "hero-title";
@@ -572,339 +629,162 @@ async function loadTournaments(container: HTMLElement) {
     hideLoading();
   }
 }
-// Register Page
-function renderRegisterPage(): HTMLElement {
-  const register = document.createElement("div");
-  register.className = "page content-section";
-  register.id = "register"; // Add ID for nav link highlighting
-  register.setAttribute("role", "main");
+// Combined Login/Register Page
+function renderAuthPage(isLogin = true): HTMLElement {
+  const authPage = document.createElement("div");
+  authPage.className = "page content-section";
+  authPage.id = isLogin ? "login" : "register";
+  authPage.setAttribute("role", "main");
+  
   const formContainer = document.createElement("div");
   formContainer.className = "form-container";
-  const title = document.createElement("h2");
-  title.className = "form-title";
-  title.id = "register-form-title";
-  title.textContent = "Register for Neon Pong";
-  formContainer.appendChild(title);
-  const form = document.createElement("form");
-  form.setAttribute("aria-labelledby", "register-form-title");
-  form.noValidate = true; // Disable default browser validation for custom handling
-  // Username
-  const usernameLabel = document.createElement("label");
-  usernameLabel.className = "form-label";
-  usernameLabel.htmlFor = "username";
-  usernameLabel.textContent = "Username";
-  form.appendChild(usernameLabel);
-  const usernameInput = document.createElement("input");
-  usernameInput.type = "text";
-  usernameInput.id = "username";
-  usernameInput.className = "form-input";
-  usernameInput.placeholder = "Choose a unique username";
-  usernameInput.required = true;
-  usernameInput.setAttribute("aria-describedby", "username-error");
-  form.appendChild(usernameInput);
-  const usernameError = document.createElement("span");
-  usernameError.id = "username-error";
-  usernameError.className = "form-error";
-  usernameError.setAttribute("aria-live", "polite");
-  usernameError.setAttribute("role", "alert");
-  form.appendChild(usernameError);
-  // Email
-  const emailLabel = document.createElement("label");
-  emailLabel.className = "form-label";
-  emailLabel.htmlFor = "email";
-  emailLabel.textContent = "Email";
-  form.appendChild(emailLabel);
-  const emailInput = document.createElement("input");
-  emailInput.type = "email";
-  emailInput.id = "email";
-  emailInput.className = "form-input";
-  emailInput.placeholder = "Enter your email";
-  emailInput.required = true;
-  emailInput.setAttribute("aria-describedby", "email-error");
-  form.appendChild(emailInput);
-  const emailError = document.createElement("span");
-  emailError.id = "email-error";
-  emailError.className = "form-error";
-  emailError.setAttribute("aria-live", "polite");
-  emailError.setAttribute("role", "alert");
-  form.appendChild(emailError);
-  // Password
-  const passwordLabel = document.createElement("label");
-  passwordLabel.className = "form-label";
-  passwordLabel.htmlFor = "password";
-  passwordLabel.textContent = "Password";
-  form.appendChild(passwordLabel);
-  const passwordInput = document.createElement("input");
-  passwordInput.type = "password";
-  passwordInput.id = "password";
-  passwordInput.className = "form-input";
-  passwordInput.placeholder = "Create a strong password";
-  passwordInput.required = true;
-  passwordInput.setAttribute("aria-describedby", "password-error");
-  form.appendChild(passwordInput);
-  const passwordError = document.createElement("span");
-  passwordError.id = "password-error";
-  passwordError.className = "form-error";
-  passwordError.setAttribute("aria-live", "polite");
-  passwordError.setAttribute("role", "alert");
-  form.appendChild(passwordError);
-  // Confirm Password
-  const confirmPasswordLabel = document.createElement("label");
-  confirmPasswordLabel.className = "form-label";
-  confirmPasswordLabel.htmlFor = "confirmPassword";
-  confirmPasswordLabel.textContent = "Confirm Password";
-  form.appendChild(confirmPasswordLabel);
-  const confirmPasswordInput = document.createElement("input");
-  confirmPasswordInput.type = "password";
-  confirmPasswordInput.id = "confirmPassword";
-  confirmPasswordInput.className = "form-input";
-  confirmPasswordInput.placeholder = "Re-enter your password";
-  confirmPasswordInput.required = true;
-  confirmPasswordInput.setAttribute(
-    "aria-describedby",
-    "confirm-password-error"
-  );
-  form.appendChild(confirmPasswordInput);
-  const confirmPasswordError = document.createElement("span");
-  confirmPasswordError.id = "confirm-password-error";
-  confirmPasswordError.className = "form-error";
-  confirmPasswordError.setAttribute("aria-live", "polite");
-  confirmPasswordError.setAttribute("role", "alert");
-  form.appendChild(confirmPasswordError);
-  const submitButton = document.createElement("button");
-  submitButton.type = "submit";
-  submitButton.className = "primary-button";
-  submitButton.textContent = "Register Account";
-  form.appendChild(submitButton);
-  const backButton = document.createElement("button");
-  backButton.type = "button";
-  backButton.className = "secondary-button back-button";
-  backButton.textContent = "Back to Home";
-  backButton.addEventListener("click", () => navigateTo("/"));
-  form.appendChild(backButton);
-  form.addEventListener("submit", async (e) => {
+  
+  // Toggle between login/register
+  const toggleText = document.createElement("p");
+  toggleText.className = "text-center mt-4";
+  const toggleLink = document.createElement("a");
+  toggleLink.href = "#";
+  toggleLink.className = "text-blue-500 hover:underline";
+  toggleLink.textContent = isLogin ? "Create an ACCOUNT" : "Sign in to existing ACCOUNT";
+  toggleLink.addEventListener("click", (e: Event) => {
     e.preventDefault();
-    // Clear previous errors
-    usernameError.textContent = "";
-    emailError.textContent = "";
-    passwordError.textContent = "";
-    confirmPasswordError.textContent = "";
-    usernameInput.removeAttribute("aria-invalid");
-    emailInput.removeAttribute("aria-invalid");
-    passwordInput.removeAttribute("aria-invalid");
-    confirmPasswordInput.removeAttribute("aria-invalid");
-    let isValid = true;
-    let firstInvalidField: HTMLElement | null = null;
-    // Validation logic (same as before)
-    if (!usernameInput.value.trim()) {
-      usernameError.textContent = "Username is required.";
-      usernameInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = usernameInput;
-    }
-    if (!emailInput.value.trim() || !/\S+@\S+\.\S+/.test(emailInput.value)) {
-      emailError.textContent = "A valid email is required.";
-      emailInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = emailInput;
-    }
-    if (!passwordInput.value || passwordInput.value.length < 6) {
-      passwordError.textContent = "Password must be at least 6 characters.";
-      passwordInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = passwordInput;
-    }
-    if (passwordInput.value !== confirmPasswordInput.value) {
-      confirmPasswordError.textContent = "Passwords do not match.";
-      confirmPasswordInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = confirmPasswordInput;
-    }
-    if (!isValid) {
-      showMessage("Please correct the errors in the form.", "error");
-      if (firstInvalidField) {
-        firstInvalidField.focus();
-      }
-      return;
-    }
-    //for registration
-    showLoading();
-    try {
-      const result = await apiService.users.register(
-        usernameInput.value.trim(),
-        passwordInput.value,
-        emailInput.value.trim()
-      );
-      if (result.data) {
-        currentUser = {
-          id: result.data.userId,
-          username: usernameInput.value.trim(),
-        };
-        showMessage(
-          "Registration successful! Welcome to Neon Pong.",
-          "success"
-        );
-        form.reset();
-        navigateTo("/tournament");
-      } else {
-        showMessage(
-          result.error || "Registration failed. Please try again.",
-          "error"
-        );
-      }
-    } catch (error) {
-      showMessage("Registration failed. Please try again.", "error");
-      console.error("Registration error:", error);
-    } finally {
-      hideLoading();
-    }
+    const newPath = isLogin ? "/register" : "/login";
+    navigateTo(newPath);
   });
-  formContainer.appendChild(form);
-  register.appendChild(formContainer);
-  register.appendChild(createFooter());
-  return register;
-}
-function renderLoginPage(): HTMLElement {
-  const login = document.createElement("div");
-  login.className = "page content-section";
-  login.id = "login";
-  login.setAttribute("role", "main");
-  const formContainer = document.createElement("div");
-  formContainer.className = "form-container";
+  toggleText.appendChild(document.createTextNode(isLogin ? "Don't have an ACCOUNT? " : "Already have an ACCOUNT? "));
+  toggleText.appendChild(toggleLink);
+
+  // Form title
   const title = document.createElement("h2");
   title.className = "form-title";
-  title.id = "login-form-title";
-  title.textContent = "Login to Neon Pong";
-  formContainer.appendChild(title);
+  title.textContent = isLogin ? "Login to Neon Pong" : "Register for Neon Pong";
+  
+  // Form element
   const form = document.createElement("form");
-  form.setAttribute("aria-labelledby", "login-form-title");
   form.noValidate = true;
-  // Username
+
+  // Username field (always shown)
   const usernameLabel = document.createElement("label");
   usernameLabel.className = "form-label";
-  usernameLabel.htmlFor = "login-username";
   usernameLabel.textContent = "Username";
-  form.appendChild(usernameLabel);
   const usernameInput = document.createElement("input");
   usernameInput.type = "text";
-  usernameInput.id = "login-username";
   usernameInput.className = "form-input";
-  usernameInput.placeholder = "Enter your username";
   usernameInput.required = true;
-  usernameInput.setAttribute("aria-describedby", "login-username-error");
-  form.appendChild(usernameInput);
-  const usernameError = document.createElement("span");
-  usernameError.id = "login-username-error";
-  usernameError.className = "form-error";
-  usernameError.setAttribute("aria-live", "polite");
-  usernameError.setAttribute("role", "alert");
-  form.appendChild(usernameError);
-  // Password
+  
+  // Email field (only for registration)
+  let emailInput: HTMLInputElement | null = null;
+  if (!isLogin) {
+    const emailLabel = document.createElement("label");
+    emailLabel.className = "form-label";
+    emailLabel.textContent = "Email";
+    emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.className = "form-input";
+    emailInput.required = true;
+    form.appendChild(emailLabel);
+    form.appendChild(emailInput);
+  }
+
+  // Password field (always shown)
   const passwordLabel = document.createElement("label");
   passwordLabel.className = "form-label";
-  passwordLabel.htmlFor = "login-password";
   passwordLabel.textContent = "Password";
-  form.appendChild(passwordLabel);
   const passwordInput = document.createElement("input");
   passwordInput.type = "password";
-  passwordInput.id = "login-password";
   passwordInput.className = "form-input";
-  passwordInput.placeholder = "Enter your password";
   passwordInput.required = true;
-  passwordInput.setAttribute("aria-describedby", "login-password-error");
-  form.appendChild(passwordInput);
-  const passwordError = document.createElement("span");
-  passwordError.id = "login-password-error";
-  passwordError.className = "form-error";
-  passwordError.setAttribute("aria-live", "polite");
-  passwordError.setAttribute("role", "alert");
-  form.appendChild(passwordError);
+
+  // Confirm Password (only for registration)
+  let confirmPasswordInput: HTMLInputElement | null = null;
+  if (!isLogin) {
+    const confirmLabel = document.createElement("label");
+    confirmLabel.className = "form-label";
+    confirmLabel.textContent = "Confirm Password";
+    confirmPasswordInput = document.createElement("input");
+    confirmPasswordInput.type = "password";
+    confirmPasswordInput.className = "form-input";
+    confirmPasswordInput.required = true;
+    form.appendChild(confirmLabel);
+    form.appendChild(confirmPasswordInput);
+  }
+
+  // Submit button
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
-  submitButton.className = "primary-button";
-  submitButton.textContent = "Login";
-  form.appendChild(submitButton);
+  submitButton.className = "primary-button w-full";
+  submitButton.textContent = isLogin ? "Login" : "Register";
+
+  // Back button
   const backButton = document.createElement("button");
   backButton.type = "button";
-  backButton.className = "secondary-button back-button";
+  backButton.className = "secondary-button w-full mt-2";
   backButton.textContent = "Back to Home";
   backButton.addEventListener("click", () => navigateTo("/"));
+
+  // Assemble the form
+  form.appendChild(usernameLabel);
+  form.appendChild(usernameInput);
+  form.appendChild(passwordLabel);
+  form.appendChild(passwordInput);
+  form.appendChild(submitButton);
   form.appendChild(backButton);
-  // Link to register page
-  const registerLinkContainer = document.createElement("div");
-  registerLinkContainer.style.textAlign = "center";
-  registerLinkContainer.style.marginTop = "1rem";
-  registerLinkContainer.innerHTML = `
-    <p style="color: var(--text-color-light);">
-      Don't have an account?
-      <a href="/register" style="color: var(--primary-color); text-decoration: none;" id="register-link">Register here</a>
-    </p>
-  `;
-  const registerLink = registerLinkContainer.querySelector("#register-link");
-  registerLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    navigateTo("/register");
-  });
-  form.appendChild(registerLinkContainer);
+  
+  formContainer.appendChild(title);
+  formContainer.appendChild(form);
+  formContainer.appendChild(toggleText);
+  
+  authPage.appendChild(formContainer);
+  authPage.appendChild(createFooter());
+
+  // Form submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // Clear previous errors
-    usernameError.textContent = "";
-    passwordError.textContent = "";
-    usernameInput.removeAttribute("aria-invalid");
-    passwordInput.removeAttribute("aria-invalid");
-    let isValid = true;
-    let firstInvalidField: HTMLElement | null = null;
-    // Validation
-    if (!usernameInput.value.trim()) {
-      usernameError.textContent = "Username is required.";
-      usernameInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = usernameInput;
-    }
-    if (!passwordInput.value) {
-      passwordError.textContent = "Password is required.";
-      passwordInput.setAttribute("aria-invalid", "true");
-      isValid = false;
-      if (!firstInvalidField) firstInvalidField = passwordInput;
-    }
-    if (!isValid) {
-      showMessage("Please fill in all required fields.", "error");
-      if (firstInvalidField) {
-        firstInvalidField.focus();
-      }
+    
+    if (!isLogin && passwordInput.value !== confirmPasswordInput?.value) {
+      showMessage("Passwords do not match", "error");
       return;
     }
-    //for login
+
     showLoading();
     try {
-      const result = await apiService.users.login(
-        usernameInput.value.trim(),
-        passwordInput.value
-      );
-      if (result.data) {
-        currentUser = {
-          id: result.data.userId,
-          username: result.data.username
-        };
-        showMessage(`Welcome back, ${result.data.username}!`, "success");
-        form.reset();
-        navigateTo("/tournament");
-      } else {
-        showMessage(result.error || "Login failed. Please check your credentials.", "error");
+      if (isLogin) {
+        const result = await apiService.users.login(
+          usernameInput.value,
+          passwordInput.value
+        );
+        if (result.data) {
+          currentUser = { id: result.data.userId, username: usernameInput.value };
+          showMessage("Login successful!", "success");
+          navigateTo("/tournament");
+        } else {
+          showMessage(result.error || "Login failed", "error");
+        }
+      } else if (emailInput) {
+        const result = await apiService.users.register(
+          usernameInput.value,
+          passwordInput.value,
+          emailInput.value
+        );
+        if (result.data) {
+          currentUser = { id: result.data.userId, username: usernameInput.value };
+          showMessage("Registration successful!", "success");
+          navigateTo("/tournament");
+        } else {
+          showMessage(result.error || "Registration failed", "error");
+        }
       }
     } catch (error) {
-      showMessage("Login failed. Please try again.", "error");
-      console.error("Login error:", error);
+      console.error("Auth error:", error);
+      showMessage("An error occurred. Please try again.", "error");
     } finally {
       hideLoading();
     }
   });
-  formContainer.appendChild(form);
-  login.appendChild(formContainer);
-  login.appendChild(createFooter());
-  return login;
+
+  return authPage;
 }
+
 // Create Tournament Modal
 function showCreateTournamentModal() {
   const modal = document.createElement("div");
@@ -1014,122 +894,7 @@ function showCreateTournamentModal() {
     }
   });
 }
-// Join Tournament Modal
-function showJoinTournamentModal(tournament: any) {
-  const modal = document.createElement("div");
-  modal.className = "modal-overlay";
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  `;
-  const modalContent = document.createElement("div");
-  modalContent.className = "modal-content";
-  modalContent.style.cssText = `
-    background: var(--bg-color);
-    border: 2px solid var(--primary-color);
-    border-radius: 10px;
-    padding: 2rem;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 0 20px var(--primary-color);
-    max-height: 80vh;
-    overflow-y: auto;
-  `;
-  let inputsHTML = "";
-  for (let i = 1; i <= tournament.max_players; i++) {
-    inputsHTML += `
-      <label for="alias-${i}" style="display: block; margin-bottom: 0.5rem; color: var(--text-color);">Player ${i} Alias:</label>
-      <input type="text" id="alias-${i}" required maxlength="10" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid var(--primary-color); border-radius: 5px; background: var(--bg-color); color: var(--text-color);" placeholder="Enter unique alias">
-    `;
-  }
-  modalContent.innerHTML = `
-    <h2 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Join "${tournament.name}"</h2>
-    <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-color-light);">Enter ${tournament.max_players} unique player aliases:</p>
-    <form id="join-tournament-form">
-      ${inputsHTML}
-      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button type="button" id="cancel-join" class="secondary-button">Cancel</button>
-        <button type="submit" class="primary-button">Join Tournament</button>
-      </div>
-    </form>
-  `;
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-  const form = modal.querySelector("#join-tournament-form") as HTMLFormElement;
-  const cancelBtn = modal.querySelector("#cancel-join") as HTMLButtonElement;
-  cancelBtn.addEventListener("click", () => {
-    document.body.removeChild(modal);
-  });
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      document.body.removeChild(modal);
-    }
-  });
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!currentUser) {
-      showMessage("Please register first to join a tournament.", "error");
-      document.body.removeChild(modal);
-      navigateTo("/register");
-      return;
-    }
-    const aliases = [];
-    for (let i = 1; i <= tournament.max_players; i++) {
-      const input = modal.querySelector(`#alias-${i}`) as HTMLInputElement;
-      const alias = input.value.trim();
-      if (!alias) {
-        showMessage(`Please enter alias for Player ${i}.`, "error");
-        input.focus();
-        return;
-      }
-      aliases.push(alias);
-    }
-    // Check for duplicate aliases
-    const uniqueAliases = new Set(aliases);
-    if (uniqueAliases.size !== aliases.length) {
-      showMessage("All aliases must be unique!", "error");
-      return;
-    }
-    //join tournament using aliases
-    showLoading();
-    try {
-      const result = await apiService.tournaments.join(
-        tournament.id,
-        aliases,
-        currentUser.id
-      );
-      if (result.data) {
-        showMessage(
-          `Successfully joined "${tournament.name}" with ${aliases.length} players!`,
-          "success"
-        );
-        document.body.removeChild(modal);
-        // Refresh tournament page
-        if (window.location.pathname === "/tournament") {
-          const app = document.getElementById("app");
-          if (app) {
-            setupRoutes(app);
-          }
-        }
-      } else {
-        showMessage(result.error || "Failed to join tournament.", "error");
-      }
-    } catch (error) {
-      showMessage("Failed to join tournament. Please try again.", "error");
-      console.error("Tournament join error:", error);
-    } finally {
-      hideLoading();
-    }
-  });
-}
+
 // Router setup function
 function setupRoutes(app: HTMLElement): void {
   const path = window.location.pathname;
@@ -1147,9 +912,11 @@ function setupRoutes(app: HTMLElement): void {
   // Define route mapping
   const routes: { [key: string]: () => HTMLElement } = {
     "/": renderHomePage,
+    "/login": () => renderAuthPage(true),
+    "/register": () => renderAuthPage(false),
     "/tournament": renderTournamentPage,
-    "/register": renderRegisterPage,
-    "/login": renderLoginPage,
+    "/ACCOUNT": () => renderAuthPage(true)
+    // Add other routes as they are implemented
   };
   const renderFunction = routes[path];
   // The main content container within the page that will hold dynamic content
@@ -1209,59 +976,76 @@ function setupRoutes(app: HTMLElement): void {
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('[App] DOM fully loaded, initializing application...');
   
+  // Initialize language system
+  console.log('[App] Initializing language system...');
+  try {
+    await initLanguage();
+    console.log('[App] Language system initialized');
+    
+    // Check if language switcher was properly initialized
+    const langSwitcher = document.querySelector('#language-switcher-container select.language-select');
+    if (!langSwitcher) {
+      console.warn('[App] Main language switcher not found, creating fallback...');
+      const { createFallbackLanguageSwitcher } = await import('./language');
+      createFallbackLanguageSwitcher();
+    }
+  } catch (error) {
+    console.error('[App] Error initializing language system:', error);
+    try {
+      // Try to load fallback if main initialization fails
+      const { createFallbackLanguageSwitcher } = await import('./language');
+      createFallbackLanguageSwitcher();
+    } catch (fallbackError) {
+      console.error('[App] Failed to create fallback language switcher:', fallbackError);
+    }
+  }
+  
+  console.log('[App] Finding app container...');
   const app = document.getElementById("app");
   if (!app) {
-    console.error('[App] Could not find app element');
+    console.error('[App] Failed to find #app element');
+    return;
+  }
+  if (!app) {
+    console.error('Failed to find #app element');
     return;
   }
 
+  // Create and append the navbar first
+  console.log('[App] Creating navigation bar...');
+  const navbar = createNavbar();
+  document.body.insertBefore(navbar, app);
+  
+  // Make sure language switcher is initialized after navbar is in the DOM
+  console.log('[App] Initializing language switcher...');
   try {
-    // Create and append the navbar first
-    console.log('[App] Creating navigation bar...');
-    const navbar = createNavbar();
-    document.body.prepend(navbar);
-    
-    // Add loading overlay if it doesn't exist
-    if (!document.getElementById("loading-overlay")) {
-      document.body.appendChild(createLoadingOverlay());
-    }
-    
-    // Set up routes to render the initial page
-    console.log('[App] Setting up routes...');
-    setupRoutes(app);
-    
-    // Initialize language system after navbar is created
-    console.log('[App] Initializing language system...');
-    initLanguage();
-    
-    // Force update all UI texts after a small delay to ensure all elements are rendered
-    console.log('[App] Scheduling initial UI update...');
-    setTimeout(() => {
-      console.log('[App] Updating UI texts...');
-      // Update UI texts
-      const event = new CustomEvent('languageChanged', { 
-        detail: { initialLoad: true } 
-      });
-      document.dispatchEvent(event);
-      
-      // Ensure language switcher is properly initialized
-      const container = document.getElementById('language-switcher-container');
-      if (container) {
-        const select = container.querySelector('select.language-select');
-        if (select) {
-          console.log('[App] Language switcher found and initialized');
-        } else {
-          console.warn('[App] Language select element not found in container');
-        }
-      } else {
-        console.warn('[App] Language switcher container not found');
-      }
-    }, 500); // Increased delay to ensure all elements are rendered
-    
-    console.log('[App] Initialization complete');
+    await initLanguage();
+    console.log('[App] Language switcher initialized');
   } catch (error) {
-    console.error('[App] Error during initialization:', error);
+    console.error('[App] Error initializing language switcher:', error);
   }
+  
+  // Add loading overlay if it doesn't exist
+  if (!document.getElementById("loading-overlay")) {
+    const loadingOverlay = createLoadingOverlay();
+    document.body.appendChild(loadingOverlay);
+  }
+
+  // Set up routes
+  console.log('[App] Setting up routes...');
+  setupRoutes(app);
+  
+  // Handle browser back/forward
+  window.addEventListener('popstate', () => {
+    setupRoutes(app);
+  });
+
+  // Ensure home page is shown by default if no route matches
+  if (window.location.pathname === '/' || window.location.pathname === '') {
+    navigateTo('/');
+  }
+
+  console.log('[App] Initialization complete');
 });
 // Handle browser history changes (back/forward buttons)
 window.addEventListener("popstate", () => {

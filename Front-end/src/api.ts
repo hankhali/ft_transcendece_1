@@ -25,7 +25,7 @@ export interface JoinTournamentRequest {
 }
 
 // Base API URL - update this to match your backend
-const API_BASE_URL = 'http://localhost:5000'; 
+const API_BASE_URL = 'http://localhost:8000'; 
 
 // Generic fetch wrapper
 export async function fetchApi<T>(

@@ -310,13 +310,19 @@ const LANGUAGES: {code: Language, name: string, flag: string}[] = [
 
 // Create language switcher HTML
 export function createLanguageSwitcher(): HTMLDivElement {
+  console.log('[i18n] Creating language switcher...');
+  
   const container = document.createElement('div');
   container.className = 'language-switcher';
+  console.log('[i18n] Created container:', container);
   
   const select = document.createElement('select');
   select.className = 'language-select';
   select.setAttribute('aria-label', 'Select language');
+  select.title = 'Select language';
+  select.tabIndex = 0;
   
+  console.log('[i18n] Adding language options...');
   // Add language options with flags
   LANGUAGES.forEach(lang => {
     const option = document.createElement('option');
@@ -325,13 +331,19 @@ export function createLanguageSwitcher(): HTMLDivElement {
     select.appendChild(option);
   });
   
-  // Set initial selected value
+  // Set the current language
   select.value = currentLanguage;
   
-  // Add change handler
-  select.addEventListener('change', handleLanguageChange);
+  // Add change event listener
+  select.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement;
+    const newLang = target.value as Language;
+    console.log(`[i18n] Language changed to: ${newLang}`);
+    setLanguage(newLang);
+  });
   
   container.appendChild(select);
+  console.log('[i18n] Language switcher created:', container);
   return container;
 }
 
@@ -357,10 +369,49 @@ export function initLanguage(): void {
   try {
     console.log('[i18n] Initializing language system...');
     
-    // Add language switcher to the page
-    const container = document.getElementById('language-switcher-container');
-    if (container) {
-      console.log('[i18n] Found language switcher container, creating switcher...');
+    // Add a style tag to the head to ensure our styles take precedence
+    const style = document.createElement('style');
+    style.textContent = `
+      .language-select,
+      .language-select:focus,
+      .language-select:active,
+      .language-select:hover,
+      .language-switcher,
+      .language-switcher-container,
+      #language-switcher-container,
+      #language-switcher-container * {
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+      
+      select.language-select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 12px !important;
+        padding-right: 30px !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Set up event listeners for language changes
+    setupLanguageEventListeners();
+    
+    // Function to initialize the language switcher
+    const initializeSwitcher = (): boolean => {
+      console.log('[i18n] Looking for language switcher container...');
+      const container = document.getElementById('language-switcher-container');
+      
+      if (!container) {
+        console.error('[i18n] Language switcher container not found!');
+        return false;
+      }
+      
+      console.log('[i18n] Found container, checking parent:', container.parentElement);
       
       // Create the language switcher
       const switcher = createLanguageSwitcher();
@@ -370,72 +421,126 @@ export function initLanguage(): void {
       container.appendChild(switcher);
       
       // Make sure the container is visible
-      container.style.display = 'block';
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
       container.style.visibility = 'visible';
+      container.style.opacity = '1';
+      
+      // Add debug styles
+      container.style.border = '1px solid #00ff00';
+      container.style.padding = '5px';
+      container.style.borderRadius = '4px';
       
       // Find the select element we just created
       const select = container.querySelector('select.language-select') as HTMLSelectElement;
-      if (select) {
-        // Set the initial selected value
-        select.value = currentLanguage;
-        console.log(`[i18n] Set initial language to: ${currentLanguage}`);
-        
-        // Add change event listener if not already present
-        if (!select.hasAttribute('data-initialized')) {
-          select.setAttribute('data-initialized', 'true');
-          select.addEventListener('change', (e) => {
-            const newLang = (e.target as HTMLSelectElement).value as Language;
-            console.log(`[i18n] Language changed to: ${newLang}`);
-            setLanguage(newLang);
-          });
-        }
-      } else {
-        console.warn('[i18n] Could not find language select element after creation');
+      if (!select) {
+        console.error('[i18n] Failed to create select element!');
+        return false;
       }
+      
+      // Set the initial selected value and add change handler
+      select.value = currentLanguage;
+      select.setAttribute('data-initialized', 'true');
+      
+      // Add change event listener
+      select.addEventListener('change', (e: Event) => {
+        const target = e.target as HTMLSelectElement;
+        const newLang = target.value as Language;
+        console.log(`[i18n] Language changed to: ${newLang}`);
+        setLanguage(newLang);
+      });
       
       console.log('[i18n] Language switcher initialized successfully');
-    } else {
-      console.warn('[i18n] Language switcher container not found, creating a fallback...');
-      // Create a fallback container in the top-right corner
-      const fallbackContainer = document.createElement('div');
-      fallbackContainer.id = 'language-switcher-fallback';
-      fallbackContainer.className = 'language-switcher-container';
-      fallbackContainer.style.position = 'fixed';
-      fallbackContainer.style.top = '10px';
-      fallbackContainer.style.right = '10px';
-      fallbackContainer.style.zIndex = '9999';
-      document.body.appendChild(fallbackContainer);
-      fallbackContainer.appendChild(createLanguageSwitcher());
+      return true;
+    };
+    
+    // Try to initialize immediately
+    if (!initializeSwitcher()) {
+      // If it fails, try again after a short delay to ensure DOM is ready
+      console.log('[i18n] Retrying language switcher initialization...');
+      setTimeout(() => {
+        if (!initializeSwitcher()) {
+          console.error('[i18n] Failed to initialize language switcher after retry');
+        }
+      }, 500);
     }
-    
-    // Remove any existing listeners to prevent duplicates
-    window.removeEventListener('popstate', updateUITexts);
-    document.removeEventListener('languageChanged', updateUITexts);
-    
-    // Listen for route changes to update translations
-    window.addEventListener('popstate', updateUITexts);
-    
-    // Listen for custom language change events
-    document.addEventListener('languageChanged', updateUITexts);
-    
-    // Initial UI update with a small delay to ensure all elements are rendered
-    setTimeout(() => {
-      console.log('[i18n] Performing initial UI update...');
-      updateUITexts();
-      
-      // Double-check the language switcher value
-      const select = document.querySelector('.language-select') as HTMLSelectElement;
-      if (select && select.value !== currentLanguage) {
-        console.log(`[i18n] Correcting language switcher value to: ${currentLanguage}`);
-        select.value = currentLanguage;
-      }
-    }, 300); // Increased delay for better reliability
-    
-    console.log('[i18n] Language system initialized');
   } catch (error) {
     console.error('[i18n] Error initializing language system:', error);
   }
 }
+
+// Create a fallback language switcher in case the main one fails
+export function createFallbackLanguageSwitcher(): void {
+  console.warn('[i18n] Creating fallback language switcher...');
+  const fallbackContainer = document.createElement('div');
+  fallbackContainer.id = 'language-switcher-fallback';
+  fallbackContainer.className = 'language-switcher-container';
+  fallbackContainer.style.position = 'fixed';
+  fallbackContainer.style.top = '10px';
+  fallbackContainer.style.right = '10px';
+  fallbackContainer.style.zIndex = '9999';
+  fallbackContainer.style.padding = '10px';
+  fallbackContainer.style.background = '#1a1a2e';
+  fallbackContainer.style.border = '1px solid #00e6ff';
+  fallbackContainer.style.borderRadius = '4px';
+  
+  const select = document.createElement('select');
+  select.className = 'language-select';
+  select.style.padding = '5px';
+  select.style.borderRadius = '4px';
+  select.style.border = '1px solid #00e6ff';
+  select.style.background = '#1a1a2e';
+  select.style.color = 'white';
+  
+  LANGUAGES.forEach(lang => {
+    const option = document.createElement('option');
+    option.value = lang.code;
+    option.textContent = `${lang.flag} ${lang.name}`;
+    select.appendChild(option);
+  });
+  
+  select.value = currentLanguage;
+  select.addEventListener('change', (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    const newLang = target.value as Language;
+    console.log(`[i18n] Language changed to: ${newLang}`);
+    setLanguage(newLang);
+  });
+  
+  fallbackContainer.appendChild(select);
+  document.body.appendChild(fallbackContainer);
+  console.log('[i18n] Fallback language switcher created');
+}
+
+// Set up event listeners for language changes
+function setupLanguageEventListeners(): void {
+  // Remove any existing listeners to prevent duplicates
+  window.removeEventListener('popstate', updateUITexts);
+  document.removeEventListener('languageChanged', updateUITexts);
+  
+  // Listen for route changes to update translations
+  window.addEventListener('popstate', updateUITexts);
+  
+  // Listen for custom language change events
+  document.addEventListener('languageChanged', updateUITexts);
+  
+  // Initial UI update with a small delay to ensure all elements are rendered
+  setTimeout(() => {
+    console.log('[i18n] Performing initial UI update...');
+    updateUITexts();
+    
+    // Double-check the language switcher value
+    const select = document.querySelector('.language-select') as HTMLSelectElement;
+    if (select && select.value !== currentLanguage) {
+      console.log(`[i18n] Correcting language switcher value to: ${currentLanguage}`);
+      select.value = currentLanguage;
+    }
+  }, 300); // Increased delay for better reliability
+  
+  console.log('[i18n] Language system initialized');
+}
+
 
 // Export current language
 export { currentLanguage };
