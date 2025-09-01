@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+@import './styles/profile-settings.css';
 
 /* Accessibility Variables */
 :root {
@@ -500,13 +501,12 @@ p {
 .navbar-logo {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #fff;
-  text-decoration: none;
+  color: #00e6ff; /* Fallback color */
   background: linear-gradient(90deg, #00e6ff, #00a8ff);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 1px;
   padding: 1rem 0;
@@ -2253,5 +2253,211 @@ footer p {
 
 .neon-game-container.hidden {
     display: none;
+}
+
+/* Profile Dropdown Styles */
+.profile-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+.profile-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.profile-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
+}
+
+.profile-button i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-color);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(8, 8, 32, 0.98);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  margin-top: 0.5rem;
+}
+
+.profile-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-content {
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.profile-settings-container {
+  transition: all 0.3s ease;
+}
+
+.profile-form-container {
+  padding: 1rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.dropdown-back {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-back:hover {
+  color: var(--secondary-color);
+  padding-left: 0.25rem;
+}
+
+.dropdown-back i {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-back:hover i {
+  transform: translateX(-3px);
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 230, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-header i {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  color: var(--primary-color);
+}
+
+.dropdown-header span {
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(0, 230, 255, 0.2);
+  margin: 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item i {
+  margin-right: 0.75rem;
+  width: 20px;
+  text-align: center;
+  color: var(--primary-color);
+  transition: transform 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 230, 255, 0.1);
+  color: var(--primary-color);
+  padding-left: 1.5rem;
+}
+
+.dropdown-item:hover i {
+  transform: scale(1.1);
+}
+
+/* Animation for dropdown content */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .profile-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 80vh;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+    transform: translateY(100%);
+  }
+  
+  .profile-dropdown.show {
+    transform: translateY(0);
+  }
+  
+  .dropdown-content {
+    max-height: calc(80vh - 60px);
+    overflow-y: auto;
+  }
+}
+
+/* Make sure the navbar can contain the dropdown */
+.navbar {
+  position: relative;
+  z-index: 100;
+}
+
+/* Adjust navbar links to accommodate the profile button */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 

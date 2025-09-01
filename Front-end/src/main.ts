@@ -3,7 +3,8 @@ import "./style.css"; // Ensure your CSS is imported
 import "./language.css"; // Import language switcher styles
 import { createNeonPongGame } from "./game.ts";
 import { apiService } from "./api.ts";
-import { initLanguage, updateUITexts } from "./language";
+import { createProfileSettings } from "./components/ProfileSettings";
+import { initLanguage } from "./language";
 
 // Global variables for message display
 declare global {
@@ -18,7 +19,7 @@ let currentUser: { id: number; username: string } | null = null;
 window.currentGameContainer = null;
 
 // Utility function to navigate between pages
-function navigateTo(path: string) {
+export function navigateTo(path: string) {
   showLoading();
   // Simulate network delay for a smoother loading experience
   setTimeout(() => {
@@ -37,6 +38,26 @@ function navigateTo(path: string) {
     hideLoading();
   }, 300); // Simulate 300ms loading
 }
+
+interface Tournament {
+  id: number;
+  name: string;
+  status: string;
+  max_players: number;
+  // Add other tournament properties as needed
+}
+
+function showJoinTournamentModal(tournament?: Tournament) {
+  if (!tournament) {
+    console.log('No tournament selected');
+    return;
+  }
+  
+  console.log(`Joining tournament: ${tournament.name}`);
+  // TODO: Implement join tournament modal with the selected tournament
+  // This will be implemented in a future update
+}
+
 // Helper to get page title based on path
 function getPageTitle(path: string): string {
   switch (path) {
@@ -145,6 +166,7 @@ function adjustFontSize(increase: boolean): void {
     const display = document.querySelector('.font-size-display') as HTMLElement;
     if (display) {
       const size = Math.round(fontSizeMultiplier * 100);
+      const announcement = `Font size set to ${size}%`;
       display.textContent = `${size}%`;
       // Save preference
       localStorage.setItem('fontSizeMultiplier', fontSizeMultiplier.toString());
@@ -152,7 +174,6 @@ function adjustFontSize(increase: boolean): void {
       display.classList.add('active');
       setTimeout(() => display.classList.remove('active'), 500);
       // Announce change for screen readers
-  
       const liveRegion = document.getElementById('a11y-announcement');
       if (liveRegion) {
         liveRegion.textContent = announcement;
@@ -274,6 +295,140 @@ function createNavbar(): HTMLElement {
   navLinks.appendChild(homeLink);
   navLinks.appendChild(tournamentsLink);
   navLinks.appendChild(ACCOUNTLink);
+  
+  // Profile Dropdown
+  const profileContainer = document.createElement('div');
+  profileContainer.className = 'profile-container';
+  
+  const profileButton = document.createElement('button');
+  profileButton.className = 'profile-button';
+  profileButton.setAttribute('aria-label', 'Profile menu');
+  profileButton.setAttribute('aria-expanded', 'false');
+  profileButton.setAttribute('aria-haspopup', 'true');
+  
+  const profileIcon = document.createElement('i');
+  profileIcon.className = 'fas fa-user-circle';
+  profileButton.appendChild(profileIcon);
+  
+  const dropdownMenu = document.createElement('div');
+  dropdownMenu.className = 'profile-dropdown';
+  dropdownMenu.setAttribute('role', 'menu');
+  
+  // Dropdown content will be added here
+  const dropdownContent = document.createElement('div');
+  dropdownContent.className = 'dropdown-content';
+  // Create profile settings container
+  const settingsContainer = document.createElement('div');
+  settingsContainer.className = 'profile-settings-container';
+  
+  // Create profile header
+  const header = document.createElement('div');
+  header.className = 'dropdown-header';
+  header.innerHTML = `
+    <i class="fas fa-user-circle"></i>
+    <span>Guest</span>
+  `;
+  
+  settingsContainer.appendChild(header);
+  
+  // Add divider
+  const divider = document.createElement('div');
+  divider.className = 'dropdown-divider';
+  settingsContainer.appendChild(divider);
+  
+  // Add menu items
+  const menuItems = [
+    { icon: 'fa-cog', text: 'Profile Settings', action: 'settings' },
+    { icon: 'fa-sign-out-alt', text: 'Sign Out', action: 'signout' }
+  ];
+  
+  menuItems.forEach(item => {
+    const menuItem = document.createElement('a');
+    menuItem.href = '#';
+    menuItem.className = 'dropdown-item';
+    menuItem.setAttribute('role', 'menuitem');
+    menuItem.setAttribute('data-action', item.action);
+    menuItem.innerHTML = `
+      <i class="fas ${item.icon}"></i>
+      <span>${item.text}</span>
+    `;
+    settingsContainer.appendChild(menuItem);
+  });
+  
+  dropdownContent.appendChild(settingsContainer);
+  
+  // Create profile settings form (initially hidden)
+  const profileFormContainer = document.createElement('div');
+  profileFormContainer.className = 'profile-form-container';
+  profileFormContainer.style.display = 'none';
+  
+  // Add back button
+  const backButton = document.createElement('button');
+  backButton.className = 'dropdown-back';
+  backButton.innerHTML = `
+    <i class="fas fa-arrow-left"></i>
+    <span>Back to Menu</span>
+  `;
+  backButton.addEventListener('click', () => {
+    settingsContainer.style.display = 'block';
+    profileFormContainer.style.display = 'none';
+  });
+  
+  profileFormContainer.appendChild(backButton);
+  
+  // Add profile settings form
+  const profileForm = createProfileSettings({
+    username: 'username123', // Replace with actual user data
+    displayName: 'Player',   // Replace with actual user data
+    skillLevel: 'intermediate', // Default skill level
+    bio: 'Ping pong enthusiast!',
+    avatar: ''
+  });
+  
+  profileFormContainer.appendChild(profileForm);
+  dropdownContent.appendChild(profileFormContainer);
+  
+  // Handle menu item clicks
+  dropdownContent.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const menuItem = target.closest('.dropdown-item') as HTMLElement;
+    
+    if (!menuItem) return;
+    
+    e.preventDefault();
+    const action = menuItem.getAttribute('data-action');
+    
+    if (action === 'settings') {
+      settingsContainer.style.display = 'none';
+      profileFormContainer.style.display = 'block';
+    } else if (action === 'signout') {
+      // Handle sign out
+      console.log('User signed out');
+      // TODO: Implement sign out logic
+    }
+  });
+  
+  dropdownMenu.appendChild(dropdownContent);
+  profileContainer.appendChild(profileButton);
+  profileContainer.appendChild(dropdownMenu);
+  
+  // Toggle dropdown on button click
+  profileButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isExpanded = profileButton.getAttribute('aria-expanded') === 'true';
+    profileButton.setAttribute('aria-expanded', (!isExpanded).toString());
+    dropdownMenu.classList.toggle('show', !isExpanded);
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!profileContainer.contains(e.target as Node)) {
+      profileButton.setAttribute('aria-expanded', 'false');
+      dropdownMenu.classList.remove('show');
+    }
+  });
+  
+  navLinks.appendChild(profileContainer);
   
   // Accessibility Controls
   const accessibilityControls = document.createElement('div');
@@ -965,6 +1120,7 @@ function setupRoutes(app: HTMLElement): void {
     "/login": () => renderAuthPage(true),
     "/register": () => renderAuthPage(false),
     "/tournament": renderTournamentPage,
+    "/profile": () => createProfileSettings(),
     "/ACCOUNT": () => renderAuthPage(true)
     // Add other routes as they are implemented
   };
