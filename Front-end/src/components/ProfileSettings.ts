@@ -1,4 +1,3 @@
-import { navigateTo } from '../main';
 
 interface UserProfile {
   username: string;
@@ -320,10 +319,5 @@ function createFormField({
   return group;
 }
 
-// Helper function to show messages (this should be imported from your main app)
-function showMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
-  // This should be replaced with your app's message system
-  console.log(`[${type.toUpperCase()}] ${message}`);
-  // For now, we'll just use an alert
-  alert(`${type.toUpperCase()}: ${message}`);
-}
+// Use the global showMessage function from main.ts
+const showMessage = window.showMessage;

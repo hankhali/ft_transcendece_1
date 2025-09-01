@@ -1223,23 +1223,174 @@ button:disabled {
 }
 
 .error-message {
-  background-color: rgba(255, 107, 107, 0.1);
-  border-left: 4px solid var(--error-color);
-  color: var(--error-color);
-  text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+  background: linear-gradient(145deg, rgba(25, 35, 60, 0.95), rgba(15, 25, 50, 0.98));
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-left: 4px solid #ff6b6b;
+  color: #ffa8a8;
+  padding: 1.2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 82, 82, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  margin: 1rem auto;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  position: relative;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.error-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff6b6b, transparent);
+  animation: shimmer 3s infinite;
+}
+
+.error-message i {
+  color: #ff6b6b;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
 }
 
 .success-message {
-  background-color: rgba(102, 187, 106, 0.1);
-  border-left: 4px solid var(--success-color);
-  color: var(--success-color);
-  text-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
+  background: linear-gradient(145deg, rgba(25, 35, 60, 0.95), rgba(15, 25, 50, 0.98));
+  border: 1px solid rgba(0, 230, 255, 0.2);
+  border-left: 4px solid #00e6ff;
+  color: #ffffff;
+  padding: 1.2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 230, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  margin: 1rem auto;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  position: relative;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.success-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00e6ff, transparent);
+  animation: shimmer 3s infinite;
+}
+
+.success-message::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 230, 255, 0.05), transparent 30%, transparent 70%, rgba(0, 230, 255, 0.05));
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.success-message i {
+  font-size: 1.5rem;
+  color: #00e6ff;
+  text-shadow: 0 0 10px rgba(0, 230, 255, 0.7);
+}
+
+.success-message .message-content {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.success-message .close-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-message .close-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
 }
 .info-message {
-    background-color: rgba(0, 187, 255, 0.1); /* Lighter blue */
-    border-left: 4px solid #00BBE6; /* Primary color */
-    color: #00BBE6;
-    text-shadow: 0 0 5px rgba(0, 187, 255, 0.3);
+  background: linear-gradient(145deg, rgba(15, 25, 40, 0.95), rgba(5, 15, 30, 0.98));
+  border: 1px solid rgba(0, 187, 230, 0.2);
+  border-left: 4px solid #00BBE6;
+  color: #80d8ff;
+  padding: 1.2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 187, 230, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  margin: 1rem auto;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  position: relative;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.info-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00BBE6, transparent);
+  animation: shimmer 3s infinite;
+}
+
+.info-message i {
+  color: #00BBE6;
+  text-shadow: 0 0 10px rgba(0, 187, 230, 0.7);
 }
 
 /* Tournament List */

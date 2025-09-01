@@ -9,6 +9,10 @@ import { initLanguage } from "./language";
 // Global variables for message display
 declare global {
   interface Window {
+    showMessage: (text: string, type?: 'success' | 'error' | 'info') => void;
+    messageTimeout: number | null;
+  }
+  interface Window {
     messageTimeout: number | null;
     currentGameContainer: HTMLElement | null;
   }
@@ -122,18 +126,55 @@ function showMessage(
   if (window.messageTimeout) {
     clearTimeout(window.messageTimeout);
   }
+
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${type}-message`;
-  messageDiv.textContent = text;
+  
+  // Create message content container
+  const messageContent = document.createElement("div");
+  messageContent.className = "message-content";
+  messageContent.textContent = text;
+  
+  // Create close button
+  const closeButton = document.createElement("button");
+  closeButton.className = "close-button";
+  closeButton.innerHTML = "&times;";
+  closeButton.setAttribute("aria-label", "Close message");
+  closeButton.addEventListener("click", () => {
+    messageDiv.remove();
+    if (window.messageTimeout) {
+      clearTimeout(window.messageTimeout);
+    }
+  });
+  
+  // Add icon based on message type
+  let icon = "";
+  if (type === "success") icon = "✓";
+  else if (type === "error") icon = "✕";
+  else icon = "ℹ";
+  
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "message-icon";
+  iconSpan.textContent = icon;
+  
+  // Assemble the message
+  messageDiv.appendChild(iconSpan);
+  messageDiv.appendChild(messageContent);
+  messageDiv.appendChild(closeButton);
+  
+  // Accessibility
   messageDiv.setAttribute("role", "status");
   messageDiv.setAttribute("aria-live", "polite");
   messageDiv.setAttribute("aria-atomic", "true");
-  document.body.appendChild(messageDiv); // Append to the body instead of app
+  
+  // Add to DOM
+  document.body.appendChild(messageDiv);
+  
+  // Auto-hide after delay
   window.messageTimeout = setTimeout(() => {
-    messageDiv.classList.add("hidden");
-    messageDiv.addEventListener("transitionend", () => messageDiv.remove(), {
-      once: true,
-    });
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transform = 'translateY(-20px)';
+    setTimeout(() => messageDiv.remove(), 300);
   }, 5000);
 }
 // Global variables for accessibility features
@@ -448,9 +489,11 @@ function createNavbar(): HTMLElement {
   languageSwitcherContainer.style.height = '40px';
   languageSwitcherContainer.style.alignItems = 'center';
   languageSwitcherContainer.style.justifyContent = 'center';
-  languageSwitcherContainer.style.border = '2px solid red';
-  languageSwitcherContainer.style.padding = '10px';
-  languageSwitcherContainer.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+  languageSwitcherContainer.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+  languageSwitcherContainer.style.borderRadius = '6px';
+  languageSwitcherContainer.style.padding = '0.5rem';
+  languageSwitcherContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+  languageSwitcherContainer.style.transition = 'all 0.2s ease';
   
   // Make sure the select is visible
   const select = languageSwitcherContainer.querySelector('select');
