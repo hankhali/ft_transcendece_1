@@ -484,7 +484,7 @@ p {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 0.8rem 3rem;
+  padding: 0.5rem 1.5rem; /* Reduced padding */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -499,9 +499,9 @@ p {
 }
 
 .navbar-logo {
-  font-size: 1.8rem;
+  font-size: 1.3rem; /* Slightly smaller logo */
   font-weight: 700;
-  color: #00e6ff;
+  color: #fff;
   text-decoration: none;
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 1.5px;
@@ -509,32 +509,29 @@ p {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   padding: 0.5rem 0;
-  display: inline-block;
-  background: linear-gradient(90deg, #00e6ff, #00a8ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
+  margin-right: 1rem; /* Reduced margin */
 }
 
 .navbar-links-container {
   display: flex;
   align-items: center;
-  gap: 1.2rem; /* Reduced gap between items */
-  margin-left: 4rem; /* Increased left margin */
-  margin-right: -1rem; /* Pull items slightly to the right */
+  gap: 0.8rem; /* Further reduced gap between items */
+  margin-right: -0.5rem; /* Pull items slightly to the right */
 }
 
 .navbar-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.8rem; /* Reduced gap between navigation items */
   align-items: center;
+  padding: 0.5rem 0; /* Reduced vertical padding */
 }
 
 .navbar-link {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
+  font-size: 0.9rem; /* Slightly smaller font size */
+  padding: 0.4rem 0.8rem; /* Reduced padding */
   padding: 0.8rem 1rem;
   font-size: 0.9rem;
   text-transform: uppercase;

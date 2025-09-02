@@ -335,6 +335,19 @@ function createNavbar(): HTMLElement {
   });
   navLinks.appendChild(homeLink);
   navLinks.appendChild(tournamentsLink);
+  
+  // Add Dashboard link
+  const dashboardLink = document.createElement("a");
+  dashboardLink.href = "/dashboard";
+  dashboardLink.className = "navbar-link";
+  dashboardLink.textContent = "Dashboard";
+  dashboardLink.setAttribute("role", "menuitem");
+  dashboardLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigateTo("/dashboard");
+  });
+  navLinks.appendChild(dashboardLink);
+  
   navLinks.appendChild(ACCOUNTLink);
   
   // Profile Dropdown
