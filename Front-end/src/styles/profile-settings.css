@@ -1,3 +1,156 @@
+/* Spectacular Button Styles */
+.settings-button-container {
+  margin: 0.5rem 0;  /* Reduced from 1.5rem */
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-button-container:hover {
+  transform: translateY(-2px);
+}
+
+.settings-button {
+  width: 100%;
+  padding: 1.2rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Button Background Effect */
+.settings-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: 0.5s;
+  z-index: -1;
+}
+
+.settings-button:hover::before {
+  left: 100%;
+}
+
+/* Button Content */
+.button-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  transition: all 0.3s ease;
+}
+
+.button-text {
+  flex-grow: 1;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.button-arrow, .button-check {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+/* Advanced Settings Button */
+.advanced-toggle-button {
+  background: linear-gradient(135deg, #6e45e2 0%, #89d4cf 100%);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.advanced-toggle-button:hover {
+  box-shadow: 0 8px 25px rgba(110, 69, 226, 0.4);
+}
+
+.advanced-toggle-button .button-arrow {
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+.advanced-toggle-button:hover .button-arrow {
+  transform: translateX(4px);
+}
+
+/* Game History Button */
+.game-history-button {
+  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.game-history-button:hover {
+  box-shadow: 0 8px 25px rgba(0, 198, 255, 0.4);
+}
+
+.game-history-button .button-arrow {
+  transform: translateX(0) rotate(-45deg);
+  transition: all 0.3s ease;
+}
+
+.game-history-button:hover .button-arrow {
+  transform: translateX(4px) rotate(0);
+}
+
+/* Save Changes Button */
+.save-changes-button {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-top: 0.75rem;  /* Reduced from 1rem */
+}
+
+.save-changes-button:hover {
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+}
+
+.save-changes-button .button-check {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.save-changes-button:hover .button-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Button Ripple Effect */
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
 /* Spectacular Profile Settings */
 @keyframes float {
   0%, 100% { transform: translateY(0); }

@@ -161,13 +161,14 @@ export function createProfileSettings(profile: Partial<UserProfile> = {}): HTMLE
     placeholder: 'Tell us about yourself...'
   });
 
-  // Advanced Settings Toggle
+  // Advanced Settings Toggle - Styled Button
   const advancedToggle = document.createElement('div');
-  advancedToggle.className = 'advanced-toggle';
+  advancedToggle.className = 'settings-button-container';
   advancedToggle.innerHTML = `
-    <button type="button" class="advanced-toggle-button">
-      <i class="fas fa-cog"></i> Advanced Settings
-      <i class="fas fa-chevron-down"></i>
+    <button type="button" class="settings-button advanced-toggle-button">
+      <span class="button-icon"><i class="fas fa-sliders-h"></i></span>
+      <span class="button-text">ADVANCED SETTINGS</span>
+      <span class="button-arrow"><i class="fas fa-chevron-down"></i></span>
     </button>
   `;
 
@@ -210,11 +211,16 @@ export function createProfileSettings(profile: Partial<UserProfile> = {}): HTMLE
     }
   });
 
-  // Submit Button
-  const submitButton = document.createElement('button');
-  submitButton.type = 'submit';
-  submitButton.className = 'primary-button';
-  submitButton.textContent = 'Save Changes';
+  // Submit Button - Styled
+  const submitButton = document.createElement('div');
+  submitButton.className = 'settings-button-container';
+  submitButton.innerHTML = `
+    <button type="submit" class="settings-button save-changes-button">
+      <span class="button-icon"><i class="fas fa-save"></i></span>
+      <span class="button-text">SAVE CHANGES</span>
+      <span class="button-check"><i class="fas fa-check"></i></span>
+    </button>
+  `;
 
   // Assemble the form
   form.appendChild(avatarOuterContainer);
@@ -224,6 +230,24 @@ export function createProfileSettings(profile: Partial<UserProfile> = {}): HTMLE
   form.appendChild(bioField);
   form.appendChild(advancedToggle);
   form.appendChild(advancedContent);
+  
+  // Game History Button - Styled
+  const gameHistoryButton = document.createElement('div');
+  gameHistoryButton.className = 'settings-button-container';
+  gameHistoryButton.innerHTML = `
+    <button type="button" class="settings-button game-history-button">
+      <span class="button-icon"><i class="fas fa-history"></i></span>
+      <span class="button-text">GAME HISTORY</span>
+      <span class="button-arrow"><i class="fas fa-external-link-alt"></i></span>
+    </button>
+  `;
+  
+  gameHistoryButton.querySelector('button')?.addEventListener('click', () => {
+    console.log('Game History clicked');
+    showMessage('Game History feature coming soon!', 'info');
+  });
+  
+  form.appendChild(gameHistoryButton);
   form.appendChild(submitButton);
 
   // Form submission
