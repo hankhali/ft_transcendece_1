@@ -627,15 +627,6 @@ Make sure the hero section is also transparent to let the background animation s
   text-shadow: 0 0 5px rgba(0, 230, 255, 0.3);
 }
 
-/* Tournament Types Section */
-.tournament-types-section {
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-}
 
 .tournament-carousel-container {
     position: relative;
@@ -1266,19 +1257,7 @@ footer p {
     height: 80px;
   }
 
-  /* Tournament Types Carousel */
-  .tournament-carousel-container {
-      width: 100%;
-      padding: 0 10px; /* Reduced padding for more card space */
-  }
-  .tournament-types-grid {
-    gap: 1rem; /* Reduced gap between cards */
-  }
-  .tournament-type-card {
-      width: calc(100vw - 80px); /* 100% of viewport width minus padding/margins */
-      max-width: 300px; /* Still prevent it from becoming too wide */
-      scroll-snap-align: center; /* Snap cards to the center */
-  }
+ 
   .carousel-navigation {
       width: 30px;
       height: 30px;
