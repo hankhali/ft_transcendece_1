@@ -685,25 +685,11 @@ function renderHomePage(): HTMLElement {
   heroDescription.textContent = "Challenge your friends in a fast-paced game of skill and reflexes.";
   const heroCta = document.createElement("div");
   heroCta.className = "hero-cta";
-  const playNowBtn = document.createElement("button");
-  playNowBtn.className = "primary-button play-now-button";
-  playNowBtn.setAttribute('data-i18n', 'play_now_button');
-  playNowBtn.innerHTML = '<i class="fas fa-play"></i> Play Now';
-  playNowBtn.addEventListener("click", () => navigateTo("/tournament"));
-  // 1v1 Button
-  const oneVsOneBtn = document.createElement("button");
-  oneVsOneBtn.className = "primary-button one-vs-one-button";
-  oneVsOneBtn.setAttribute('data-i18n', 'one_vs_one_button');
-  oneVsOneBtn.innerHTML = '<i class="fas fa-gamepad"></i> 1v1 Match';
-  oneVsOneBtn.addEventListener("click", () => showNeonPongGame());
   const registerCtaBtn = document.createElement("button");
   registerCtaBtn.className = "primary-button register-cta-button";
   registerCtaBtn.setAttribute('data-i18n', 'register_now_button');
   registerCtaBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register Now';
   registerCtaBtn.addEventListener("click", () => navigateTo("/register"));
-  heroCta.appendChild(playNowBtn);
-  // 1v1 Button
-  heroCta.appendChild(oneVsOneBtn);
   heroCta.appendChild(registerCtaBtn);
   heroSection.appendChild(paddleImage);
   heroSection.appendChild(heroTitle);
