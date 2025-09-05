@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Back-end
+    container_name: neon-pong-backend
+    env_file:
+      - .env
+    volumes:
+      - ./Back-end:/app
+      - backend_node_modules:/app/node_modules
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - neon-pong-network
+
+  frontend:
+    build: ./Front-end
+    container_name: neon-pong-frontend
+    volumes:
+      - ./Front-end:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "8080:8080"
+    restart: always
+    networks:
+      - neon-pong-network
+    depends_on:
+      - backend
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:
+
+networks:
+  neon-pong-network:
+    driver: bridge
